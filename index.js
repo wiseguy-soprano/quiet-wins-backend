@@ -13,6 +13,7 @@ const badgeRoutes = require('./routes/badges');
 const leaderboardRoutes = require('./routes/leaderboard');
 const searchRoutes = require('./routes/search');
 const adminRoutes = require('./routes/admin');
+const uploadRoutes = require('./routes/upload');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +37,7 @@ app.use('/api/badges', badgeRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Test route
 app.get('/', (req, res) => {
