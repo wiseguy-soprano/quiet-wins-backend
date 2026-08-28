@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { body } = require('express-validator');
 const { createClient } = require('@supabase/supabase-js');
 const authMiddleware = require('../middleware/authMiddleware');
+const validate = require('../middleware/validate');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -26,7 +28,11 @@ router.get('/me', authMiddleware, async (req, res) => {
 });
 
 // UPDATE my profile (protected)
-router.put('/me', authMiddleware, async (req, res) => {
+router.put('/me', authMiddleware, [
+  body('name').optional({ checkFalsy: true }).trim().notEmpty().isLength({ max: 100 }),
+  body('bio').optional({ checkFalsy: true }).isLength({ max: 500 }),
+  body('avatar_url').optional({ checkFalsy: true }).isURL().withMessage('avatar_url must be a valid URL')
+], validate, async (req, res) => {
   const { name, bio, avatar_url } = req.body;
 
   try {
@@ -34,7 +40,7 @@ router.put('/me', authMiddleware, async (req, res) => {
       .from('users')
       .update({ name, bio, avatar_url })
       .eq('id', req.user.id)
-      .select();
+      .select('id, name, email, role, bio, avatar_url, created_at');
 
     if (error) return res.status(400).json({ error: error.message });
 

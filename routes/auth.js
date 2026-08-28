@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { body } = require('express-validator');
 const { createClient } = require('@supabase/supabase-js');
+const validate = require('../middleware/validate');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -10,12 +12,12 @@ const supabase = createClient(
 );
 
 // REGISTER
-router.post('/register', async (req, res) => {
+router.post('/register', [
+  body('name').trim().notEmpty().withMessage('Name is required').isLength({ max: 100 }),
+  body('email').trim().isEmail().withMessage('A valid email is required').normalizeEmail(),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], validate, async (req, res) => {
   const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
 
   try {
     const salt = await bcrypt.genSalt(10);
@@ -35,12 +37,11 @@ router.post('/register', async (req, res) => {
 });
 
 // LOGIN
-router.post('/login', async (req, res) => {
+router.post('/login', [
+  body('email').trim().isEmail().withMessage('A valid email is required').normalizeEmail(),
+  body('password').notEmpty().withMessage('Password is required')
+], validate, async (req, res) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
 
   try {
     const { data, error } = await supabase

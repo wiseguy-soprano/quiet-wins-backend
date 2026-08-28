@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const contentRoutes = require('./routes/content');
@@ -15,11 +17,16 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Render sits behind a proxy; needed for express-rate-limit to see the real client IP
+app.set('trust proxy', 1);
+
+app.use(helmet());
+app.use(cors(process.env.FRONTEND_ORIGIN ? { origin: process.env.FRONTEND_ORIGIN } : {}));
 app.use(express.json());
+app.use('/api', apiLimiter);
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/comments', commentRoutes);

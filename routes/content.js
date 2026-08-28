@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const { body } = require('express-validator');
 const { createClient } = require('@supabase/supabase-js');
 const authMiddleware = require('../middleware/authMiddleware');
+const validate = require('../middleware/validate');
+
+const CONTENT_TYPES = ['blog', 'music', 'resource'];
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -42,12 +46,13 @@ router.get('/:id', async (req, res) => {
 });
 
 // CREATE content (protected)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, [
+  body('title').trim().notEmpty().withMessage('Title is required').isLength({ max: 200 }),
+  body('type').isIn(CONTENT_TYPES).withMessage(`Type must be one of: ${CONTENT_TYPES.join(', ')}`),
+  body('body').optional({ checkFalsy: true }).isLength({ max: 50000 }),
+  body('media_url').optional({ checkFalsy: true }).isURL().withMessage('media_url must be a valid URL')
+], validate, async (req, res) => {
   const { title, type, body, media_url } = req.body;
-
-  if (!title || !type) {
-    return res.status(400).json({ error: 'Title and type are required' });
-  }
 
   try {
     const { data, error } = await supabase
@@ -64,7 +69,11 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // UPDATE content (protected)
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, [
+  body('title').optional({ checkFalsy: true }).trim().notEmpty().isLength({ max: 200 }),
+  body('body').optional({ checkFalsy: true }).isLength({ max: 50000 }),
+  body('media_url').optional({ checkFalsy: true }).isURL().withMessage('media_url must be a valid URL')
+], validate, async (req, res) => {
   const { title, body, media_url, status } = req.body;
 
   try {

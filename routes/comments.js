@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { body, param } = require('express-validator');
 const { createClient } = require('@supabase/supabase-js');
 const authMiddleware = require('../middleware/authMiddleware');
+const validate = require('../middleware/validate');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -9,12 +11,11 @@ const supabase = createClient(
 );
 
 // POST a comment (protected)
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, [
+  body('content_id').isUUID().withMessage('A valid content_id is required'),
+  body('body').trim().notEmpty().withMessage('Comment body is required').isLength({ max: 2000 })
+], validate, async (req, res) => {
   const { content_id, body } = req.body;
-
-  if (!content_id || !body) {
-    return res.status(400).json({ error: 'Content ID and body are required' });
-  }
 
   try {
     const { data, error } = await supabase
@@ -49,7 +50,9 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // GET all comments for a content item (public)
-router.get('/:contentId', async (req, res) => {
+router.get('/:contentId', [
+  param('contentId').isUUID().withMessage('A valid contentId is required')
+], validate, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('comments')
