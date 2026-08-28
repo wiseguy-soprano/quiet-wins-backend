@@ -12,18 +12,22 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
-const ALLOWED_AUDIO_TYPES = [
-  'audio/mpeg', 'audio/mp3',
-  'audio/wav', 'audio/wave', 'audio/x-wav', 'audio/vnd.wave',
-  'audio/mp4', 'audio/x-m4a', 'audio/m4a',
-  'audio/ogg', 'audio/vorbis'
-];
+// Browsers/OSes report inconsistent MIME strings for the same audio format
+// (audio/wav vs audio/wave vs audio/x-wav, etc), so validate by extension
+// instead and use a canonical content-type for the Supabase upload.
+const ALLOWED_EXTENSIONS = {
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+  '.m4a': 'audio/mp4',
+  '.ogg': 'audio/ogg'
+};
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (!ALLOWED_AUDIO_TYPES.includes(file.mimetype)) {
+    const extension = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTENSIONS[extension]) {
       return cb(new Error('Only audio files (mp3, wav, m4a, ogg) are allowed'));
     }
     cb(null, true);
@@ -37,12 +41,12 @@ router.post('/music', authMiddleware, adminMiddleware, (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
     try {
-      const extension = path.extname(req.file.originalname) || '';
+      const extension = path.extname(req.file.originalname).toLowerCase();
       const filename = `${crypto.randomUUID()}${extension}`;
 
       const { error: uploadError } = await supabase.storage
         .from('music')
-        .upload(filename, req.file.buffer, { contentType: req.file.mimetype });
+        .upload(filename, req.file.buffer, { contentType: ALLOWED_EXTENSIONS[extension] });
 
       if (uploadError) return res.status(400).json({ error: uploadError.message });
 
