@@ -7,6 +7,7 @@ const { body } = require('express-validator');
 const { createClient } = require('@supabase/supabase-js');
 const validate = require('../middleware/validate');
 const { sendEmail } = require('../utils/email');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
@@ -145,6 +146,22 @@ router.post('/reset-password', [
     await supabase.from('password_resets').update({ used: true }).eq('id', resetRow.id);
 
     res.json({ message: 'Password reset successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// LOGOUT — invalidates every token issued before now for this user
+router.post('/logout', authMiddleware, async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from('users')
+      .update({ sessions_valid_after: new Date().toISOString() })
+      .eq('id', req.user.id);
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({ message: 'Logged out successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

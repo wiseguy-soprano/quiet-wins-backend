@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const { body } = require('express-validator');
 const { createClient } = require('@supabase/supabase-js');
 const authMiddleware = require('../middleware/authMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
+const validate = require('../middleware/validate');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -12,6 +14,7 @@ const supabase = createClient(
 router.use(authMiddleware, adminMiddleware);
 
 const VALID_ROLES = ['user', 'admin'];
+const REPORT_STATUSES = ['pending', 'reviewed', 'dismissed'];
 
 // GET all users
 router.get('/users', async (req, res) => {
@@ -196,6 +199,47 @@ router.get('/analytics', async (req, res) => {
         new_content: newContent.count || 0
       }
     });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET reports, optionally filtered by status
+router.get('/reports', async (req, res) => {
+  const { status } = req.query;
+
+  try {
+    let query = supabase.from('reports').select('*').order('created_at', { ascending: false });
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({ reports: data });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// UPDATE a report's status (reviewed/dismissed) after moderation
+router.put('/reports/:id', [
+  body('status').isIn(REPORT_STATUSES).withMessage(`status must be one of: ${REPORT_STATUSES.join(', ')}`)
+], validate, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('reports')
+      .update({ status: req.body.status })
+      .eq('id', req.params.id)
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    if (!data.length) return res.status(404).json({ error: 'Report not found' });
+
+    res.json({ message: 'Report updated successfully', report: data[0] });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

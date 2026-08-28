@@ -68,4 +68,47 @@ router.get('/:contentId', [
   }
 });
 
+// UPDATE own comment (protected)
+router.put('/:id', authMiddleware, [
+  param('id').isUUID().withMessage('A valid comment id is required'),
+  body('body').trim().notEmpty().withMessage('Comment body is required').isLength({ max: 2000 })
+], validate, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .update({ body: req.body.body })
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id)
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    if (!data.length) return res.status(404).json({ error: 'Comment not found' });
+
+    res.json({ message: 'Comment updated successfully', comment: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// DELETE own comment (protected)
+router.delete('/:id', authMiddleware, [
+  param('id').isUUID().withMessage('A valid comment id is required')
+], validate, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id)
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    if (!data.length) return res.status(404).json({ error: 'Comment not found' });
+
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

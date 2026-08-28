@@ -18,12 +18,16 @@ const authMiddleware = async (req, res, next) => {
 
     const { data: user, error } = await supabase
       .from('users')
-      .select('is_active')
+      .select('is_active, sessions_valid_after')
       .eq('id', decoded.id)
       .single();
 
     if (error || !user || !user.is_active) {
       return res.status(403).json({ error: 'Account is deactivated' });
+    }
+
+    if (user.sessions_valid_after && decoded.iat * 1000 < new Date(user.sessions_valid_after).getTime()) {
+      return res.status(401).json({ error: 'Session has been logged out, please log in again' });
     }
 
     req.user = decoded;
