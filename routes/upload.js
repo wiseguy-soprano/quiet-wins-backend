@@ -16,7 +16,7 @@ const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!ALLOWED_AUDIO_TYPES.includes(file.mimetype)) {
       return cb(new Error('Only audio files (mp3, wav, m4a, ogg) are allowed'));
