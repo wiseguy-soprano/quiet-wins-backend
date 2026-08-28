@@ -39,6 +39,14 @@ router.get('/:id', async (req, res) => {
 
     if (error) return res.status(404).json({ error: 'Content not found' });
 
+    supabase
+      .from('content')
+      .update({ view_count: (data.view_count || 0) + 1 })
+      .eq('id', req.params.id)
+      .then(({ error: updateError }) => {
+        if (updateError) console.error('Failed to increment view_count:', updateError.message);
+      });
+
     res.json({ content: data });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });

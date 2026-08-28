@@ -26,6 +26,9 @@ const searchRoutes = require('./routes/search');
 const adminRoutes = require('./routes/admin');
 const uploadRoutes = require('./routes/upload');
 const reportRoutes = require('./routes/reports');
+const messageRoutes = require('./routes/messages');
+const noteRoutes = require('./routes/notes');
+const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,6 +60,9 @@ app.use('/api/search', searchRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check: also confirms the database is actually reachable
 app.get('/', async (req, res) => {

@@ -50,4 +50,22 @@ router.put('/me', authMiddleware, [
   }
 });
 
+// GET my login history (protected)
+router.get('/me/login-history', authMiddleware, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('login_history')
+      .select('id, ip_address, user_agent, created_at')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({ login_history: data });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

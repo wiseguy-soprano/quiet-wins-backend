@@ -72,6 +72,12 @@ router.post('/login', [
       { expiresIn: '7d' }
     );
 
+    await supabase.from('login_history').insert([{
+      user_id: data.id,
+      ip_address: req.ip,
+      user_agent: req.headers['user-agent'] || null
+    }]);
+
     res.json({ message: 'Login successful', token, user: { id: data.id, name: data.name, email: data.email, role: data.role } });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
