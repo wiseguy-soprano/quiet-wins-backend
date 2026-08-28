@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken');
+const { createClient } = require('@supabase/supabase-js');
 
-const authMiddleware = (req, res, next) => {
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
+
+const authMiddleware = async (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {
@@ -9,6 +15,17 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('is_active')
+      .eq('id', decoded.id)
+      .single();
+
+    if (error || !user || !user.is_active) {
+      return res.status(403).json({ error: 'Account is deactivated' });
+    }
+
     req.user = decoded;
     next();
   } catch (err) {
