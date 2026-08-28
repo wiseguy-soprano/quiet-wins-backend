@@ -12,7 +12,12 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
-const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/ogg'];
+const ALLOWED_AUDIO_TYPES = [
+  'audio/mpeg', 'audio/mp3',
+  'audio/wav', 'audio/wave', 'audio/x-wav', 'audio/vnd.wave',
+  'audio/mp4', 'audio/x-m4a', 'audio/m4a',
+  'audio/ogg', 'audio/vorbis'
+];
 
 const upload = multer({
   storage: multer.memoryStorage(),
