@@ -7,6 +7,8 @@ const contentRoutes = require('./routes/content');
 const commentRoutes = require('./routes/comments');
 const notificationRoutes = require('./routes/notifications');
 const likeRoutes = require('./routes/likes');
+const badgeRoutes = require('./routes/badges');
+const leaderboardRoutes = require('./routes/leaderboard');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +23,8 @@ app.use('/api/content', contentRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/likes', likeRoutes);
+app.use('/api/badges', badgeRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 // Test route
 app.get('/', (req, res) => {
