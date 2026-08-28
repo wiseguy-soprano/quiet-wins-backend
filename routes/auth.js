@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
     const { data, error } = await supabase
       .from('users')
       .insert([{ name, email, password_hash }])
-      .select();
+      .select('id, name, email, role, bio, avatar_url, created_at');
 
     if (error) return res.status(400).json({ error: error.message });
 
