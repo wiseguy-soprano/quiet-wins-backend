@@ -141,6 +141,43 @@
     return { myPosts, myComments };
   }
 
+  /* ---------- badges & leaderboard ---------- */
+  async function paintStanding() {
+    try {
+      const [badgesRes, leaderboardRes] = await Promise.all([
+        fetch('/api/badges/me', { headers: authHeaders() }),
+        fetch('/api/leaderboard')
+      ]);
+
+      if (badgesRes.ok) {
+        const { badges, stats } = await badgesRes.json();
+        $('#myPoints').textContent = stats.points || 0;
+
+        const list = $('#badgeList');
+        list.textContent = '';
+        badges.forEach((b) => {
+          const chip = document.createElement('span');
+          chip.className = 'account-badge' + (b.earned ? ' is-earned' : '');
+          chip.title = b.description;
+          const icon = document.createElement('span');
+          icon.className = 'account-badge-icon';
+          icon.textContent = b.icon || '•';
+          chip.appendChild(icon);
+          chip.appendChild(document.createTextNode(b.name));
+          list.appendChild(chip);
+        });
+      }
+
+      if (leaderboardRes.ok) {
+        const { leaderboard } = await leaderboardRes.json();
+        const mine = leaderboard.find((row) => row.user_id === user.id);
+        $('#myRank').textContent = mine ? '#' + mine.rank : 'unranked';
+      }
+    } catch (_) {
+      // non-critical widget: leave the defaults on screen rather than erroring out the page
+    }
+  }
+
   /* ---------- boot ---------- */
   async function boot() {
     const fresh = await PUS.refresh();
@@ -160,6 +197,7 @@
     paintPreview();
     syncBioCount();
     paintRoomStats();
+    paintStanding();
   }
   boot();
 

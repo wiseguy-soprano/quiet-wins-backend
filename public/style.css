@@ -850,6 +850,15 @@
   }
   .account-stat span{ font-size:.78rem; color:var(--smoke); }
 
+  .account-badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .account-badge{
+    display:flex; align-items:center; gap:8px;
+    padding:8px 14px; border:1px solid rgba(255,255,255,.1); border-radius:999px;
+    font-size:.75rem; color:var(--smoke);
+  }
+  .account-badge.is-earned{ border-color:var(--gold-dim); color:var(--bone); background:rgba(214,163,74,.08); }
+  .account-badge .account-badge-icon{ font-size:1rem; }
+
   .btn-danger{
     display:inline-flex; align-items:center; gap:10px;
     border:1px solid rgba(224,138,114,.4); color:#e08a72;
