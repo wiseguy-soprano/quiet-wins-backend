@@ -5,20 +5,27 @@ const { createClient } = require('@supabase/supabase-js');
 const authMiddleware = require('../middleware/authMiddleware');
 const validate = require('../middleware/validate');
 
-const CONTENT_TYPES = ['blog', 'music', 'resource'];
+const CONTENT_TYPES = ['blog', 'music', 'resource', 'community'];
+const TOPICS = ['GENERAL', 'BOOKS', 'MUSIC', 'FILM'];
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
-// GET all content (public)
+// GET all content, optionally filtered by type (public)
 router.get('/', async (req, res) => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('content')
-      .select('*')
+      .select('*, author:users(name, avatar_hue)')
       .order('created_at', { ascending: false });
+
+    if (req.query.type) {
+      query = query.eq('type', req.query.type);
+    }
+
+    const { data, error } = await query;
 
     if (error) return res.status(400).json({ error: error.message });
 
@@ -58,14 +65,15 @@ router.post('/', authMiddleware, [
   body('title').trim().notEmpty().withMessage('Title is required').isLength({ max: 200 }),
   body('type').isIn(CONTENT_TYPES).withMessage(`Type must be one of: ${CONTENT_TYPES.join(', ')}`),
   body('body').optional({ checkFalsy: true }).isLength({ max: 50000 }),
-  body('media_url').optional({ checkFalsy: true }).isURL().withMessage('media_url must be a valid URL')
+  body('media_url').optional({ checkFalsy: true }).isURL().withMessage('media_url must be a valid URL'),
+  body('topic').optional({ checkFalsy: true }).isIn(TOPICS).withMessage(`Topic must be one of: ${TOPICS.join(', ')}`)
 ], validate, async (req, res) => {
-  const { title, type, body, media_url } = req.body;
+  const { title, type, body, media_url, topic } = req.body;
 
   try {
     const { data, error } = await supabase
       .from('content')
-      .insert([{ title, type, body, media_url, user_id: req.user.id }])
+      .insert([{ title, type, body, media_url, topic, user_id: req.user.id }])
       .select();
 
     if (error) return res.status(400).json({ error: error.message });

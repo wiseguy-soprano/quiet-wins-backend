@@ -56,7 +56,7 @@ router.get('/:contentId', [
   try {
     const { data, error } = await supabase
       .from('comments')
-      .select('*')
+      .select('*, author:users(name, avatar_hue)')
       .eq('content_id', req.params.contentId)
       .order('created_at', { ascending: true });
 

@@ -1,0 +1,893 @@
+  :root{
+    --void:#050403;
+    --panel:#0b0906;
+    --gold:#d6a34a;
+    --gold-bright:#f3c46a;
+    --gold-dim:#6f5326;
+    --bone:#f2ead9;
+    --smoke:#a89d89;
+    --hair-w:1440px;
+    /* The studio mark: sun.png, a real alpha cut-out keyed from the hero
+       sprite and trimmed to the glow. An earlier pass blended the .jpg with
+       mix-blend-mode:screen, but that only works when the element has a
+       backdrop to blend with — inside the home page's animated logo (a
+       transform makes a stacking context) it left a black box. Alpha has no
+       such dependency. Swapping the mark everywhere is this one line. */
+    --mark:url('images/sun.png');
+    --mark-ratio:256 / 242;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--void);
+    color:var(--bone);
+    font-family:'Jost', sans-serif;
+    position:relative;
+    overflow-x:hidden;
+  }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; background:none; border:none; color:inherit; }
+  input{ font-family:inherit; }
+  img,svg{ display:block; }
+  ul{ list-style:none; }
+  .serif{ font-family:'Cormorant Garamond', serif; }
+
+
+
+  .wrap{ max-width:var(--hair-w); margin:0 auto; padding:0 24px; }
+  @media(min-width:1024px){ .wrap{ padding:0 40px; } }
+
+  /* ---------- Photo assets ---------- */
+  .community-thumb{
+    width:64px; height:64px; border-radius:50%; object-fit:cover; flex-shrink:0;
+    box-shadow: 0 0 0 1px rgba(214,163,74,.4), 0 0 26px rgba(255,180,60,.45);
+  }
+
+  /* ---------- Shared bits ---------- */
+  .hairline{ height:1px; background:linear-gradient(90deg, var(--gold), transparent); }
+  .hairline-center{ height:1px; background:linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .gold{ color:var(--gold); }
+  .gold-bright{ color:var(--gold-bright); }
+  .smoke{ color:var(--smoke); }
+  .bone{ color:var(--bone); }
+
+  .link-underline{ position:relative; display:inline-block; }
+  .link-underline::after{
+    content:''; position:absolute; left:0; bottom:-4px; height:1px; width:0;
+    background:var(--gold); transition:width .35s ease;
+  }
+  .link-underline:hover::after{ width:100%; }
+
+  .btn-ghost{
+    display:inline-flex; align-items:center; gap:10px;
+    border:1px solid var(--gold); color:var(--gold-bright);
+    font-size:.7rem; letter-spacing:.16em; padding:13px 22px;
+    transition: background .3s ease, color .3s ease, box-shadow .3s ease;
+    white-space:nowrap;
+  }
+  .btn-ghost:hover{ background:var(--gold); color:var(--panel); box-shadow:0 0 24px rgba(214,163,74,.45); }
+  .btn-ghost svg{ flex-shrink:0; }
+
+  .btn-solid{
+    background:var(--gold); color:var(--panel); font-size:.68rem; letter-spacing:.14em;
+    padding:14px 20px; transition:background .3s ease; white-space:nowrap;
+  }
+  .btn-solid:hover{ background:var(--gold-bright); }
+
+  .icon-ring{
+    border:1px solid rgba(214,163,74,.5); color:var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  }
+  .icon-ring:hover{ transform:translateY(-3px); border-color:var(--gold-bright); box-shadow:0 8px 22px rgba(214,163,74,.25); }
+  .icon-ring--round{ border-radius:50%; width:36px; height:36px; }
+  .icon-ring--square{ border-radius:4px; width:32px; height:32px; }
+
+  .reveal{ opacity:0; transform:translateY(22px); transition:opacity .8s ease, transform .8s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  ::selection{ background:var(--gold); color:var(--panel); }
+  input::placeholder{ color:#7a7060; }
+
+  /* ---------- Header ---------- */
+  .site-header{ position:relative; z-index:20; border-bottom:1px solid rgba(255,255,255,.05); }
+  .header-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px 0; }
+  .logo{ display:flex; align-items:center; gap:16px; flex-shrink:0; }
+  .logo-text-1{ font-size:1.55rem; letter-spacing:.12em; line-height:1; }
+  .logo-text-2{ font-size:1.55rem; letter-spacing:.12em; line-height:1; margin-top:-2px; }
+  .logo-sub{ font-size:.62rem; letter-spacing:.45em; color:var(--gold); margin-top:6px; }
+
+  .nav-desktop{ display:none; align-items:center; gap:32px; font-size:.72rem; letter-spacing:.18em; color:var(--smoke); }
+  .nav-desktop a.active{ color:var(--gold); padding-bottom:4px; border-bottom:1px solid var(--gold); }
+  .nav-desktop a:hover{ color:var(--bone); }
+
+  .header-actions{ display:none; align-items:center; gap:24px; flex-shrink:0; }
+  .signin-link{ font-size:.72rem; letter-spacing:.14em; color:var(--smoke); }
+  .signin-link:hover{ color:var(--bone); }
+
+  /* ---------- Menu button: three bars that fold into a cross ----------
+     Separate bars rather than one <svg> path, so the open state can be a
+     transform on each bar and the change reads as a movement — the cue that
+     the same button closes what it opened. */
+  .menu-btn{ display:flex; align-items:center; justify-content:center; color:var(--gold); padding:4px; }
+  .menu-bars{ position:relative; display:block; width:26px; height:15px; }
+  .menu-bars i{
+    position:absolute; left:0; right:0; top:50%;
+    height:1.5px; margin-top:-.75px; border-radius:2px;
+    background:currentColor;
+    transition:transform .34s cubic-bezier(.2,.85,.3,1), opacity .18s ease;
+  }
+  .menu-bars i:nth-child(1){ transform:translateY(-6.75px); }
+  .menu-bars i:nth-child(3){ transform:translateY(6.75px); }
+
+  .menu-btn.is-open .menu-bars i:nth-child(1){ transform:translateY(0) rotate(45deg); }
+  .menu-btn.is-open .menu-bars i:nth-child(2){ opacity:0; transform:scaleX(.3); }
+  .menu-btn.is-open .menu-bars i:nth-child(3){ transform:translateY(0) rotate(-45deg); }
+
+  @media(prefers-reduced-motion: reduce){
+    .menu-bars i{ transition:none; }
+  }
+  .socials-row{ display:none; justify-content:flex-end; gap:12px; padding-bottom:16px; margin-top:-8px; }
+
+  .mobile-nav{ display:none; flex-direction:column; gap:16px; padding-bottom:24px; font-size:.9rem; letter-spacing:.1em; color:var(--smoke); }
+  .mobile-nav.open{ display:flex; }
+  .mobile-nav a.active{ color:var(--gold); }
+  .mobile-nav .btn-ghost{ justify-content:center; margin-top:8px; }
+
+  @media(min-width:1024px){
+    .nav-desktop, .header-actions, .socials-row{ display:flex; }
+    .menu-btn{ display:none; }
+    .mobile-nav{ display:none !important; }
+  }
+
+  /* ---------- Hero ---------- */
+  /* Cinematic intro: the sun fades up from near-black, its light wakes the
+     hills, then the copy rises from below. Layers are stacked in .hero-stage.
+
+     The plate is symmetric: the river's vanishing point sits at exactly 50%
+     of the hills image, so the sun has to be centred on the same axis or the
+     whole perspective reads as broken. Everything below keeps that axis. */
+
+  .hero{
+    position:relative;
+    overflow:hidden;
+    isolation:isolate;
+    background:#000;
+    display:flex;
+    align-items:flex-end;
+    min-height:0;
+  }
+  /* the header is ~150px tall at this breakpoint; subtracting it is what keeps
+     the horizon, both CTAs and the book cover inside the first screen instead
+     of leaving the composition half-cut at the fold */
+  @media(min-width:1024px){
+    .hero{ min-height:clamp(600px, calc(100svh - 150px), 820px); }
+  }
+
+  .hero-stage{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  .hero-stage > *{ position:absolute; }
+
+  /* deep night sky that is there before anything lights up */
+  .hero-sky{
+    inset:0;
+    background:
+      radial-gradient(120% 80% at 50% 38%, rgba(70,44,10,.55), transparent 60%),
+      linear-gradient(to bottom, #05040a 0%, #070502 55%, #030201 100%);
+    animation: skyLift 1.6s ease-out both;
+  }
+
+  /* the old plate carried the star field baked in; the cut-out sun does not,
+     so the stars are drawn here instead - three tiles at coprime sizes so the
+     repeat never lines up into a visible grid */
+  .hero-stars{
+    inset:0;
+    background-image:
+      radial-gradient(1.1px 1.1px at 34px 22px,  rgba(255,246,228,.95), transparent 60%),
+      radial-gradient(1px 1px     at 128px 96px, rgba(255,240,214,.65), transparent 60%),
+      radial-gradient(1.6px 1.6px at 233px 41px, rgba(255,250,238,.85), transparent 60%),
+      radial-gradient(1px 1px     at 61px 158px, rgba(226,214,196,.55), transparent 60%),
+      radial-gradient(1.3px 1.3px at 187px 131px,rgba(255,244,222,.75), transparent 60%);
+    background-size:317px 211px, 241px 173px, 419px 283px, 293px 197px, 359px 239px;
+    opacity:0;
+    animation: starsUp 2.6s ease-out .15s both, twinkle 7s ease-in-out 2.8s infinite alternate;
+  }
+
+  /* The sun is its own sprite, so its size is set explicitly instead of being
+     whatever `cover` happened to produce for the viewport's aspect ratio.
+     It is composited on black and blended with `screen`, which turns every
+     black pixel transparent - the alpha channel's job, at a fifth of the size.
+     left/right:0 + margin-inline:auto is what pins it to the 50% axis; the old
+     left:12% pushed it ~6% right of the river it is supposed to sit above. */
+  .hero-sun{
+    top:var(--sun-top, 2%);
+    left:0; right:0; margin-inline:auto;
+    width:clamp(230px, 30vw, 440px);
+    aspect-ratio:1305 / 1206;
+    background:url('images/sun-glow.jpg') no-repeat center / contain;
+    mix-blend-mode:screen;
+    opacity:0;
+    will-change:opacity, transform;
+    animation: sunLight 2.4s linear both,
+               sunLift  2.4s cubic-bezier(.17,.68,.28,1) both;
+  }
+  /* halo rides on the sun itself so it scales with it and never lights the disc */
+  .hero-sun::before{
+    content:''; position:absolute; inset:-28%;
+    background:radial-gradient(circle,
+      transparent 26%, rgba(255,172,62,.30) 40%, rgba(214,163,74,.10) 56%, transparent 74%);
+    filter:blur(30px);
+  }
+
+  /* the landscape, lit up a beat after the sun */
+  .hero-hills{
+    left:0; right:0; bottom:0;
+    height:var(--hills-h, 68%);
+    background:url('images/hills.png') no-repeat bottom center / cover;
+    opacity:0;
+    will-change:opacity, transform;
+    animation: hillsLight 1.5s linear .8s both,
+               hillsLift  1.5s cubic-bezier(.17,.68,.28,1) .8s both;
+  }
+
+  /* keeps the copy readable over the brightened valley: a vertical ramp for the
+     headline band, plus an edge vignette that darkens the two columns of text
+     without touching the sun in the middle */
+  .hero-haze{
+    inset:0;
+    background:
+      radial-gradient(125% 105% at 50% 42%, transparent 26%, rgba(3,2,1,.5) 78%, rgba(3,2,1,.72) 100%),
+      linear-gradient(to bottom, rgba(3,2,1,.55) 0%, rgba(3,2,1,.08) 34%, rgba(3,2,1,.4) 76%, rgba(3,2,1,.85) 100%);
+  }
+
+  @keyframes skyLift{
+    from{ opacity:.25; }
+    to  { opacity:1; }
+  }
+  @keyframes starsUp{ from{ opacity:0; } to{ opacity:.85; } }
+  @keyframes twinkle { from{ opacity:.85; } to{ opacity:.6; } }
+  /* The plates sit on black, so a plain opacity ramp *is* the brightness ramp —
+     and unlike filter:brightness() it composites on the GPU, so it never hitches.
+     Light runs linear (no plateau to read as "stuck"); the lift is eased. */
+  @keyframes sunLight{ from{ opacity:.04; } to{ opacity:1; } }
+  @keyframes sunLift { from{ transform:translateY(24px); } to{ transform:translateY(0); } }
+
+  @keyframes hillsLight{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes hillsLift { from{ transform:translateY(14px); } to{ transform:translateY(0); } }
+
+  /* copy rising from the bottom, staggered with --d */
+  .rise{
+    opacity:0;
+    transform:translateY(42px);
+    animation: riseUp .95s cubic-bezier(.22,.85,.28,1) var(--d, 0s) both;
+  }
+  @keyframes riseUp{
+    from{ opacity:0; transform:translateY(42px); }
+    to  { opacity:1; transform:translateY(0); }
+  }
+
+  /* header comes down from above, overlapping the copy rising from below */
+  .drop{
+    opacity:0;
+    transform:translateY(-26px);
+    animation: dropIn .9s cubic-bezier(.22,.85,.28,1) var(--d, 0s) both;
+  }
+  @keyframes dropIn{
+    from{ opacity:0; transform:translateY(-26px); }
+    to  { opacity:1; transform:translateY(0); }
+  }
+
+  /* ---------- Hero layout ---------- */
+  .wrap-hero-flex{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:var(--hair-w);
+    margin-inline:auto;
+    padding:0 24px 48px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    align-items:end;
+    gap:44px;
+  }
+
+  .reveal-hero-copy{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    max-width:620px;
+    gap:4px;
+  }
+
+  /* The sun is centre-stage and the copy sits low-left, so the headline runs
+     across the outer corona on mid-size desktops. That overlap is the depth of
+     the shot - legibility is bought with a scrim that fades out well before
+     the river, not by moving the sun off its axis. */
+  .reveal-hero-copy::before{
+    content:'';
+    position:absolute; z-index:-1; pointer-events:none;
+    left:-40px; right:-18%; top:-14%; bottom:-40px;
+    background:radial-gradient(120% 105% at 14% 64%,
+      rgba(4,3,2,.7) 0%, rgba(4,3,2,.42) 46%, rgba(4,3,2,0) 78%);
+  }
+
+  h1.hero-title{
+    text-shadow:0 2px 20px rgba(0,0,0,.6);
+    /* the vw floor is set so "Stories that travel worlds." still clears one
+       line at 360px, where the hard <br> otherwise forces a ragged third line */
+    font-size:clamp(1.8rem, 7.6vw, 3.3rem);
+    line-height:1.14;
+    letter-spacing:.005em;
+    text-wrap:balance;
+  }
+  #hero-description{
+    font-size:.95rem;
+    color:var(--smoke);
+    line-height:1.65;
+    max-width:440px;
+    text-shadow:0 1px 12px rgba(0,0,0,.65);
+  }
+  .hairline{ width:164px; margin:16px 0; }
+
+  .features{
+    display:flex;
+    flex-direction:column;
+    align-self:end;
+    gap:12px;
+    max-width:300px;
+    height:fit-content;
+  }
+  .features h2{ font-size:1.6rem; line-height:1.1; }
+  .features .subtitle{ font-size:1.05rem; line-height:1.2; }
+  .features > p:last-of-type{
+    font-size:.86rem; color:var(--smoke); line-height:1.6;
+  }
+  .features .hairline{ width:100%; margin:4px 0; }
+  .features .btn-ghost{ align-self:flex-start; margin-top:4px; }
+
+  .img-container{
+    width:170px;
+    height:255px;
+    background-image:url('images/book.jpg');
+    background-size:cover;
+    background-position:bottom;
+    box-shadow:0 18px 44px rgba(0,0,0,.55);
+  }
+
+  /* ---------- Hero: stacked (phones + small tablets) ----------
+     The landscape used to be glued to the bottom of a hero that grew to ~1000px
+     once the featured card wrapped underneath the copy - i.e. the hills and the
+     river sat two screens below the fold and were effectively invisible. Here
+     the plate is anchored to the TOP of the hero instead, at a fixed distance
+     under the sun, so the sun/ridge/river composition survives the stack. The
+     plate's lit bottom edge is masked into the sky so nothing ends on a cut. */
+  @media(max-width:1023px){
+    .hero{
+      --sun-top:26px;
+      --hills-top:250px;
+      --hills-h:320px;
+    }
+
+    .hero-sun{ width:clamp(195px, 50vw, 290px); }
+
+    .hero-hills{
+      top:var(--hills-top);
+      bottom:auto;
+      height:var(--hills-h);
+      background-size:190% auto;
+      background-position:bottom center;
+      -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+              mask-image:linear-gradient(to bottom, #000 0%, #000 72%, transparent 100%);
+    }
+
+    /* lighter than the desktop haze - on a phone the valley is the only piece
+       of the artwork left, so it must not be washed to black */
+    .hero-haze{
+      background:
+        radial-gradient(135% 46% at 50% 16%, transparent 34%, rgba(3,2,1,.4) 88%),
+        linear-gradient(to bottom, rgba(3,2,1,.3) 0%, rgba(3,2,1,.06) 22%, rgba(3,2,1,.5) 62%, rgba(3,2,1,.82) 88%, rgba(5,4,3,.95) 100%);
+    }
+
+    /* the copy claims exactly the height of the scene, so the headline lands on
+       the dark ridge and the CTA on the water - the same relationship the
+       desktop layout has, rather than floating in empty sky */
+    .reveal-hero-copy{
+      min-height:calc(var(--hills-top) + var(--hills-h));
+      padding-bottom:6px;
+    }
+    /* a scrim only under the body copy, where the plate is at its brightest.
+       The wrap is a z-index:2 stacking context, so -1 puts this above the
+       artwork and below the text without escaping to the page background. */
+    .reveal-hero-copy::before{
+      left:-24px; right:-24px; top:46%; bottom:-32px;
+      background:linear-gradient(to bottom, rgba(4,3,2,0), rgba(4,3,2,.34) 44%, rgba(4,3,2,.52));
+    }
+
+    /* the featured release becomes a normal block right under the scene. The
+       old dead space came from transform:scale(.8) on this card, which reserved
+       20% of its un-scaled height as an untouchable gap. */
+    .wrap-hero-flex{ gap:36px; padding-bottom:64px; }
+    .features{ max-width:none; gap:14px; }
+    .features .hairline{ max-width:320px; }
+    .features > p:last-of-type{ max-width:440px; }
+  }
+
+  @media(min-width:600px) and (max-width:1023px){
+    .hero{ --sun-top:34px; --hills-top:300px; --hills-h:390px; }
+    .hero-hills{ background-size:135% auto; }
+    .img-container{ width:190px; height:285px; }
+  }
+
+  @media(max-width:479px){
+    .hero{ --hills-top:228px; --hills-h:290px; }
+    .img-container{ width:150px; height:225px; }
+  }
+
+  /* ---------- Hero: two columns ---------- */
+  @media(min-width:1024px){
+    .wrap-hero-flex{
+      grid-template-columns:minmax(0,1fr) 300px;
+      gap:56px;
+      padding:0 40px 56px;
+    }
+    .reveal-hero-copy{ padding-bottom:4px; }
+  }
+  @media(min-width:1440px){
+    .wrap-hero-flex{ grid-template-columns:minmax(0,1fr) 330px; }
+    .img-container{ width:190px; height:285px; }
+  }
+
+  @media(prefers-reduced-motion: reduce){
+    .hero-sky, .hero-stars, .hero-sun, .hero-hills, .rise, .drop{
+      animation:none !important;
+      opacity:1;
+    }
+    .hero-sun, .hero-hills, .rise, .drop{ transform:none; }
+  }
+
+  /* ---------- What we create ---------- */
+  .section-create{ position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); background:linear-gradient(to bottom, transparent, rgba(0,0,0,.4)); padding:80px 0; }
+  .section-heading{ display:flex; align-items:center; justify-content:center; gap:24px; margin-bottom:64px; }
+  .section-heading .hairline-center{ width:64px; }
+  .section-heading h2{ font-size:.78rem; letter-spacing:.4em; color:var(--gold); white-space:nowrap; }
+
+  .create-grid{ display:grid; grid-template-columns:1fr; }
+  .create-item{ padding:32px 8px; text-align:center; display:flex; flex-direction:column; align-items:center; border-bottom:1px solid rgba(255,255,255,.05); }
+  .create-item:last-child{ border-bottom:none; }
+  .create-item svg{ color:var(--gold); margin-bottom:20px; }
+  .create-item h3{ font-size:.82rem; letter-spacing:.2em; margin-bottom:16px; }
+  .create-item p{ color:var(--smoke); font-size:.9rem; line-height:1.6; max-width:220px; }
+  .create-item .link-underline{ color:var(--gold); font-size:.68rem; letter-spacing:.16em; margin-top:24px; display:inline-flex; align-items:center; gap:8px; }
+
+  @media(min-width:640px){
+    .create-grid{ grid-template-columns:1fr 1fr; }
+    .create-item{ border-bottom:1px solid rgba(255,255,255,.05); }
+  }
+  @media(min-width:1024px){
+    .create-grid{ grid-template-columns:repeat(4,1fr); }
+    .create-item{ padding:0 32px; border-bottom:none; border-left:1px solid rgba(255,255,255,.1); }
+    .create-item:first-child{ border-left:none; }
+  }
+  /* the studio publishes two things, so the grid centres its two columns
+     rather than stretching them across the full 1440 wrap */
+  .create-grid--duo{ max-width:720px; margin-inline:auto; }
+  @media(min-width:640px){ .create-grid--duo{ grid-template-columns:1fr 1fr; } }
+  @media(min-width:1024px){ .create-grid--duo{ grid-template-columns:1fr 1fr; } }
+
+  /* ---------- Community / quote / newsletter ---------- */
+  .section-community{ position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); padding:80px 0; }
+  .community-grid{ display:grid; gap:40px; align-items:stretch; }
+  @media(min-width:1024px){ .community-grid{ grid-template-columns:repeat(3,1fr); } }
+
+  .community-card{ border:1px solid rgba(214,163,74,.25); border-radius:2px; padding:24px; display:flex; gap:20px; align-items:center; }
+  .community-card h3{ font-size:1.3rem; margin-bottom:8px; }
+  .community-card p{ color:var(--smoke); font-size:.9rem; line-height:1.6; margin-bottom:16px; }
+
+  .quote-block{ display:flex; flex-direction:column; justify-content:center; text-align:center; padding:0 16px; }
+  .quote-mark{ font-size:3rem; color:var(--gold); line-height:1; margin-bottom:-6px; }
+  .quote-block p{ font-size:1.35rem; font-style:italic; line-height:1.5; }
+  .quote-attr{ font-size:.68rem; letter-spacing:.25em; color:var(--gold); margin-top:32px; }
+
+  .newsletter h3{ font-size:.72rem; letter-spacing:.25em; color:var(--gold); margin-bottom:12px; }
+  .newsletter p{ color:var(--smoke); font-size:.9rem; line-height:1.6; margin-bottom:20px; }
+  .newsletter-form{ display:flex; gap:8px; }
+  .newsletter-form input{
+    flex:1; min-width:0; background:transparent; border:1px solid rgba(255,255,255,.2);
+    outline:none; padding:13px 16px; font-size:.9rem; color:var(--bone); transition:border-color .3s ease;
+  }
+  .newsletter-form input:focus{ border-color:var(--gold); }
+  .newsletter-msg{ color:var(--gold); font-size:.75rem; margin-top:12px; display:none; }
+  .newsletter-msg.show{ display:block; }
+
+  /* ---------- Footer ---------- */
+  .site-footer{ position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); }
+    /* padding-block, not the `32px 0` shorthand: the shorthand also zeroed the
+     inline padding this element inherits from .wrap, so the copyright line ran
+     into the right edge of the viewport on every page */
+  .footer-row{ display:flex; flex-direction:column; gap:24px; align-items:center; justify-content:space-between; padding-block:32px; text-align:center; }
+  .footer-logo{ display:flex; align-items:center; gap:12px; font-size:.72rem; letter-spacing:.25em; }
+  .footer-nav{ display:flex; flex-wrap:wrap; justify-content:center; gap:24px 20px; font-size:.68rem; letter-spacing:.14em; color:var(--smoke); }
+  .footer-nav a:hover{ color:var(--gold); }
+  .footer-copy{ font-size:.68rem; color:rgba(168,157,137,.7); }
+
+  @media(min-width:768px){
+    .footer-row{ flex-direction:row; text-align:left; }
+  }
+
+  /* ---------- Bits used in the HTML that had no styles yet ---------- */
+  .kicker{ font-size:.68rem; letter-spacing:.3em; color:var(--gold); }
+
+  /* The sprite carries its own corona out to the edge of the frame, so the box
+     runs larger than the old solid disc did for the same optical weight, and
+     the border-radius/box-shadow that faked a glow are no longer needed. */
+  .eclipse{
+    background:var(--mark) no-repeat center / contain;
+    aspect-ratio:var(--mark-ratio);
+    flex-shrink:0;
+  }
+  .eclipse--sm{ width:56px; height:auto; margin:-6px 0; }
+  .eclipse--foot{ width:32px; height:auto; margin:-4px 0; }
+
+  /* ---------- Inner pages (music, books, etc.) ---------- */
+  .page-hero{ padding:72px 0 56px; text-align:center; border-bottom:1px solid rgba(255,255,255,.05); }
+  .page-hero h1{ font-size:2.6rem; letter-spacing:.06em; margin:14px 0 18px; }
+  .page-hero p{ color:var(--smoke); font-size:.95rem; line-height:1.6; max-width:520px; margin:0 auto; }
+
+  .page-section{ padding:64px 0; border-top:1px solid rgba(255,255,255,.05); }
+
+  .card-grid{ display:grid; gap:28px; grid-template-columns:1fr; }
+  @media(min-width:640px){ .card-grid{ grid-template-columns:1fr 1fr; } }
+  @media(min-width:1024px){ .card-grid{ grid-template-columns:repeat(3,1fr); } }
+
+  .card{ border:1px solid rgba(214,163,74,.25); border-radius:2px; padding:24px; display:flex; flex-direction:column; gap:12px; transition:box-shadow .3s ease; }
+  .card:hover{ box-shadow:0 0 24px rgba(214,163,74,.15); }
+  .card h3{ font-size:1.25rem; }
+  .card p{ color:var(--smoke); font-size:.9rem; line-height:1.6; }
+  .card .link-underline{ color:var(--gold); font-size:.68rem; letter-spacing:.16em; margin-top:auto; }
+
+  .cover{
+    height:210px; display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(214,163,74,.2); margin-bottom:8px;
+    background:linear-gradient(to bottom, rgba(214,163,74,.12), rgba(0,0,0,.35));
+    background-size:cover; background-position:center;
+  }
+  .cover svg{ color:var(--gold); }
+
+  .platform-row{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:40px; }
+
+  .center-text{ max-width:640px; margin:0 auto; text-align:center; }
+  .center-text p{ color:var(--smoke); font-size:.95rem; line-height:1.7; margin-bottom:18px; }
+
+  /* ---------- Contact form ---------- */
+  .contact-form{ display:flex; flex-direction:column; gap:14px; max-width:520px; margin:0 auto; }
+  .contact-form input, .contact-form textarea{
+    background:transparent; border:1px solid rgba(255,255,255,.2); outline:none;
+    padding:13px 16px; font-size:.9rem; color:var(--bone); transition:border-color .3s ease; resize:vertical;
+  }
+  .contact-form input:focus, .contact-form textarea:focus{ border-color:var(--gold); }
+  /* ---------- Auth pages (sign in / sign up) ----------
+     These two pages shipped with markup but no styles at all, so they rendered
+     as raw browser defaults. Same vocabulary as the rest of the site: a hairline
+     gold-bordered card on the void, the eclipse motif at the top, and the shared
+     .btn-solid for the primary action. */
+  .auth-section{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:clamp(48px, 8vh, 96px) 0 clamp(64px, 10vh, 120px);
+    min-height:calc(100svh - 300px);
+    position:relative;
+  }
+  /* the same glow that sits behind the hero sun, at a whisper */
+  .auth-section::before{
+    content:'';
+    position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:radial-gradient(60% 46% at 50% 8%, rgba(214,163,74,.13), transparent 70%);
+  }
+
+  .auth-card{
+    width:100%;
+    max-width:440px;
+    margin-inline:auto;
+    border:1px solid rgba(214,163,74,.25);
+    border-radius:2px;
+    background:linear-gradient(to bottom, rgba(214,163,74,.045), rgba(0,0,0,.28));
+    padding:clamp(28px, 5vw, 44px);
+  }
+
+  .auth-head{ text-align:center; margin-bottom:30px; }
+  .auth-head h1{ font-size:2rem; letter-spacing:.01em; margin:12px 0 10px; }
+  .auth-head p{ color:var(--smoke); font-size:.88rem; line-height:1.6; }
+  .auth-head .kicker{ display:block; }
+
+  /* the eclipse mark, scaled up from the header logo */
+  .auth-sun{
+    width:84px; height:auto; margin:-6px auto 14px;
+    aspect-ratio:var(--mark-ratio);
+    background:var(--mark) no-repeat center / contain;
+  }
+
+  .auth-form{ display:flex; flex-direction:column; gap:18px; }
+
+  .auth-field{ display:flex; flex-direction:column; gap:8px; }
+  .auth-field label{
+    font-size:.62rem; letter-spacing:.22em; color:var(--gold);
+  }
+  .auth-field input{
+    background:transparent;
+    border:1px solid rgba(255,255,255,.2);
+    outline:none;
+    padding:13px 16px;
+    font-size:.9rem;
+    color:var(--bone);
+    transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  .auth-field input:focus{
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(214,163,74,.12);
+  }
+  .auth-field input:user-invalid{ border-color:#a8503c; }
+
+  .auth-row{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    gap:12px; margin-top:-2px;
+  }
+
+  .auth-check{
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:.8rem; color:var(--smoke); line-height:1.5; cursor:pointer;
+  }
+  .auth-check input{
+    appearance:none; -webkit-appearance:none;
+    width:15px; height:15px; flex-shrink:0; margin-top:2px;
+    border:1px solid rgba(214,163,74,.55); border-radius:2px;
+    background:transparent; cursor:pointer;
+    transition:background .25s ease, border-color .25s ease;
+  }
+  .auth-check input:checked{ background:var(--gold); border-color:var(--gold); }
+  .auth-check input:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+
+  .auth-link{ color:var(--gold); font-size:.8rem; }
+  .auth-link:hover{ color:var(--gold-bright); text-decoration:underline; }
+
+  .auth-submit{ width:100%; margin-top:6px; padding:15px 20px; }
+
+  .auth-note{
+    font-size:.78rem; line-height:1.5; color:var(--gold-bright);
+    min-height:1.2em; text-align:center;
+  }
+  .auth-note[data-state="error"]{ color:#e08a72; }
+
+  /* label rule with the text knocked out of the middle */
+  .auth-divider{
+    display:flex; align-items:center; gap:16px;
+    margin:28px 0 18px;
+    font-size:.6rem; letter-spacing:.3em; color:var(--gold);
+    white-space:nowrap;
+  }
+  .auth-divider::before, .auth-divider::after{
+    content:''; height:1px; flex:1;
+    background:linear-gradient(90deg, transparent, rgba(214,163,74,.5), transparent);
+  }
+
+  .auth-alt{ text-align:center; font-size:.85rem; color:var(--smoke); }
+  .auth-legal{
+    text-align:center; font-size:.72rem; line-height:1.6;
+    color:rgba(168,157,137,.7); margin-top:18px;
+  }
+
+  /* ---------- Signed-in vs signed-out chrome ----------
+     Both states ship in every page's markup. An inline snippet in <head>
+     stamps .is-authed on <html> from localStorage before first paint, so the
+     header never flashes the wrong one. */
+  .signed-in-only{ display:none !important; }
+  .is-authed .signed-out-only{ display:none !important; }
+  .is-authed .signed-in-only{ display:flex !important; }
+
+  /* ---------- Account menu ---------- */
+  .account-menu{ position:relative; }
+
+  .account-btn{
+    display:flex; align-items:center; gap:10px;
+    border:1px solid rgba(214,163,74,.4);
+    border-radius:999px;
+    padding:5px 14px 5px 5px;
+    color:var(--bone);
+    transition:border-color .3s ease, background .3s ease;
+  }
+  .account-btn:hover, .account-btn[aria-expanded="true"]{
+    border-color:var(--gold); background:rgba(214,163,74,.09);
+  }
+  .account-name{
+    font-size:.7rem; letter-spacing:.12em; max-width:14ch;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .account-caret{ color:var(--gold); transition:transform .3s ease; flex-shrink:0; }
+  .account-btn[aria-expanded="true"] .account-caret{ transform:rotate(180deg); }
+
+  /* the eclipse mark again, tinted by --hue like the community avatars */
+  .account-avatar{
+    --hue:38;
+    display:grid; place-items:center;
+    width:30px; height:30px; flex-shrink:0;
+    border-radius:50%;
+    font-size:.66rem; font-weight:500; letter-spacing:.02em;
+    color:#120c04;
+    background:radial-gradient(circle at 34% 32%,
+      hsl(var(--hue) 78% 72%), hsl(var(--hue) 62% 42%) 72%, hsl(var(--hue) 55% 26%));
+  }
+  .account-avatar--lg{ width:44px; height:44px; font-size:.9rem; }
+  .account-avatar--xl{ width:76px; height:76px; font-size:1.5rem; box-shadow:0 0 30px hsl(var(--hue) 70% 50% / .3); }
+
+  .account-pop{
+    position:absolute; top:calc(100% + 12px); right:0; z-index:60;
+    width:250px;
+    border:1px solid rgba(214,163,74,.3);
+    background:#0a0806;
+    box-shadow:0 24px 60px rgba(0,0,0,.6);
+    padding:6px;
+    animation:accountPop .22s ease-out both;
+  }
+  @keyframes accountPop{
+    from{ opacity:0; transform:translateY(-6px); }
+    to  { opacity:1; transform:translateY(0); }
+  }
+  .account-pop-head{
+    display:flex; align-items:center; gap:12px;
+    padding:14px 12px 16px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    margin-bottom:6px;
+  }
+  .account-pop-head > div{ min-width:0; }
+  .account-pop-name{ display:block; font-size:.84rem; color:var(--bone); }
+  .account-pop-mail{
+    display:block; font-size:.68rem; color:var(--smoke); margin-top:2px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .account-pop a, .account-pop button{
+    display:block; width:100%; text-align:left;
+    padding:11px 12px;
+    font-size:.76rem; letter-spacing:.06em; color:var(--smoke);
+    transition:background .25s ease, color .25s ease;
+  }
+  .account-pop a:hover, .account-pop button:hover{ background:rgba(214,163,74,.1); color:var(--bone); }
+  .account-pop hr{ border:none; border-top:1px solid rgba(255,255,255,.08); margin:6px 0; }
+  .account-pop [data-signout]{ color:var(--gold); }
+
+  .mobile-nav .mobile-signout{
+    text-align:left; padding:0;
+    font-size:.9rem; letter-spacing:.1em; color:var(--gold);
+  }
+
+  /* ---------- Account / profile settings page ---------- */
+  .account-page-head{ text-align:center; margin-bottom:clamp(32px, 5vw, 48px); }
+  .account-page-head h1{ font-size:2.2rem; margin:14px 0 10px; }
+  .account-page-head p{ color:var(--smoke); font-size:.9rem; }
+
+  .account-stack{
+    display:flex; flex-direction:column; gap:24px;
+    max-width:620px; margin:0 auto;
+  }
+  .account-card{
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:2px;
+    padding:clamp(22px, 3.5vw, 30px);
+  }
+  .account-card h2{
+    font-size:.62rem; letter-spacing:.26em; color:var(--gold);
+    margin-bottom:6px; font-weight:400;
+  }
+  .account-card > p{ color:var(--smoke); font-size:.82rem; line-height:1.6; margin-bottom:20px; }
+
+  .account-identity{
+    display:flex; align-items:center; gap:20px;
+    padding-bottom:24px; margin-bottom:24px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .account-identity-meta{ min-width:0; }
+  .account-identity-meta strong{
+    display:block; font-family:'Cormorant Garamond', serif;
+    font-size:1.5rem; font-weight:500; color:var(--bone); line-height:1.2;
+  }
+  .account-identity-meta span{ display:block; font-size:.75rem; color:var(--smoke); margin-top:4px; }
+
+  .account-swatches{ display:flex; flex-wrap:wrap; gap:9px; margin-top:10px; }
+  .account-swatch{
+    --hue:38;
+    width:26px; height:26px; border-radius:50%;
+    border:1px solid transparent;
+    background:radial-gradient(circle at 34% 32%,
+      hsl(var(--hue) 78% 72%), hsl(var(--hue) 62% 42%) 72%, hsl(var(--hue) 55% 26%));
+    box-shadow:0 0 0 1px rgba(0,0,0,.6);
+    transition:transform .25s ease, outline-color .25s ease;
+    outline:2px solid transparent; outline-offset:3px;
+  }
+  .account-swatch:hover{ transform:translateY(-2px); }
+  .account-swatch.is-on{ outline-color:var(--gold-bright); }
+
+  .account-field{ display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+  .account-field:last-of-type{ margin-bottom:0; }
+  .account-field label{ font-size:.62rem; letter-spacing:.22em; color:var(--gold); }
+  .account-field input, .account-field textarea{
+    background:transparent; border:1px solid rgba(255,255,255,.2); outline:none;
+    padding:13px 16px; font-family:inherit; font-size:.9rem; color:var(--bone);
+    resize:vertical; transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  .account-field input:focus, .account-field textarea:focus{
+    border-color:var(--gold); box-shadow:0 0 0 3px rgba(214,163,74,.12);
+  }
+  .account-field .account-hint{ font-size:.72rem; color:rgba(168,157,137,.75); }
+
+  .account-toggle{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:14px 0; cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .account-toggle:last-of-type{ border-bottom:none; }
+  .account-toggle input{
+    appearance:none; -webkit-appearance:none;
+    width:16px; height:16px; flex-shrink:0; margin-top:2px;
+    border:1px solid rgba(214,163,74,.55); border-radius:2px; background:transparent;
+    cursor:pointer; transition:background .25s ease, border-color .25s ease;
+  }
+  .account-toggle input:checked{ background:var(--gold); border-color:var(--gold); }
+  .account-toggle input:focus-visible{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+  .account-toggle span{ font-size:.85rem; line-height:1.5; color:var(--bone); }
+  .account-toggle small{ display:block; font-size:.75rem; color:var(--smoke); margin-top:3px; }
+
+  .account-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:16px; margin-top:24px; }
+  .account-saved{ font-size:.76rem; color:var(--gold-bright); opacity:0; transition:opacity .3s ease; }
+  .account-saved.is-on{ opacity:1; }
+
+  .account-card--quiet{ border-color:rgba(255,255,255,.06); background:rgba(255,255,255,.012); }
+  .account-stat{
+    display:flex; align-items:baseline; gap:10px; margin-bottom:18px;
+  }
+  .account-stat b{
+    font-family:'Cormorant Garamond', serif; font-size:1.9rem; font-weight:500;
+    color:var(--gold-bright); line-height:1;
+    font-variant-numeric:lining-nums tabular-nums;
+  }
+  .account-stat span{ font-size:.78rem; color:var(--smoke); }
+
+  .btn-danger{
+    display:inline-flex; align-items:center; gap:10px;
+    border:1px solid rgba(224,138,114,.4); color:#e08a72;
+    font-size:.66rem; letter-spacing:.16em; padding:12px 20px;
+    transition:background .3s ease, color .3s ease, border-color .3s ease;
+  }
+  .btn-danger:hover{ background:#e08a72; color:var(--panel); border-color:#e08a72; }
+
+  /* ---------- Back out of settings ---------- */
+  .account-back{
+    display:inline-flex; align-items:center; gap:9px;
+    font-size:.66rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--smoke);
+    margin-bottom:clamp(24px, 4vw, 40px);
+    transition:color .25s ease, gap .25s ease;
+  }
+  .account-back:hover{ color:var(--gold); gap:13px; }
+  .account-back svg{ flex-shrink:0; }
+
+  /* ---------- Intro, once per session ----------
+     The head snippet stamps .no-intro when this load is a plain navigation
+     and the intro has already played this session. A refresh clears it, so
+     the cinematic still runs when someone actually asks for the page again.
+     Everything below lands on the animation's end state instead of its start. */
+  .no-intro .hero-sky,
+  .no-intro .hero-sun,
+  .no-intro .hero-hills,
+  .no-intro .rise,
+  .no-intro .drop{
+    animation:none !important;
+    opacity:1;
+  }
+  .no-intro .hero-sun,
+  .no-intro .hero-hills,
+  .no-intro .rise,
+  .no-intro .drop{ transform:none; }
+  /* keep the ambient twinkle, drop only the fade-up that precedes it */
+  .no-intro .hero-stars{
+    opacity:.85;
+    animation:twinkle 7s ease-in-out infinite alternate !important;
+  }

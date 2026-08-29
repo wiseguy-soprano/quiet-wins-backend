@@ -1,0 +1,453 @@
+/* ============================================================
+   COMMUNITY PAGE — "The Reading Room"
+   Scoped to body.community-page so style.css and every other
+   page are left exactly as they are.
+   ============================================================ */
+
+.community-page{
+  --line:rgba(214,163,74,.22);
+  --line-hot:rgba(214,163,74,.5);
+  --card:rgba(255,255,255,.018);
+}
+
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+
+/* ---------- hero ---------- */
+.community-page .c-hero{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-end;
+  min-height:clamp(340px, 52vh, 520px);
+  background:#000;
+}
+
+/* the plate's own light source is the eclipse in the window, so it is
+   anchored right-of-centre and the copy sits in the dark left third */
+.community-page .c-hero-bg{
+  position:absolute; inset:0; z-index:-2;
+  background:url('images/community/reading-room.jpg') no-repeat center 38% / cover;
+  animation:cHeroIn 1.6s ease-out both;
+}
+.community-page .c-hero-scrim{
+  position:absolute; inset:0; z-index:-1;
+  background:
+    linear-gradient(to right, rgba(3,2,1,.9) 0%, rgba(3,2,1,.62) 38%, rgba(3,2,1,.12) 68%, rgba(3,2,1,.4) 100%),
+    linear-gradient(to bottom, rgba(3,2,1,.6) 0%, rgba(3,2,1,.05) 32%, rgba(3,2,1,.55) 78%, var(--void) 100%);
+}
+@keyframes cHeroIn{ from{ opacity:0; transform:scale(1.05); } to{ opacity:1; transform:scale(1); } }
+
+.community-page .c-hero-copy{
+  position:relative; z-index:1;
+  /* .wrap is a flex child here, so without an explicit width it shrinks to its
+     content and margin:0 auto drags the copy into the middle of the plate */
+  width:100%;
+  padding-top:clamp(48px, 9vw, 90px);
+  padding-bottom:clamp(28px, 5vw, 46px);
+}
+.community-page .c-hero-copy h1{
+  font-size:clamp(2.1rem, 6.4vw, 3.4rem);
+  line-height:1.1;
+  margin-top:12px;
+  text-shadow:0 2px 22px rgba(0,0,0,.65);
+}
+.community-page .c-hero-copy > p{
+  max-width:460px;
+  color:var(--smoke);
+  font-size:.94rem;
+  line-height:1.65;
+  text-shadow:0 1px 12px rgba(0,0,0,.7);
+}
+
+.community-page .c-hero-stats{
+  display:flex; flex-wrap:wrap; gap:14px 40px;
+  margin-top:30px;
+}
+.community-page .c-hero-stats div{ display:flex; flex-direction:column; gap:4px; }
+.community-page .c-hero-stats strong{
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.9rem; font-weight:500; color:var(--gold-bright); line-height:1;
+  /* Cormorant defaults to old-style figures, where "1" is a bare stroke that
+     reads as a capital I next to a label - lining figures keep the tallies
+     legible as numbers */
+  font-variant-numeric:lining-nums tabular-nums;
+}
+.community-page .c-hero-stats span{
+  font-size:.58rem; letter-spacing:.28em; color:var(--smoke);
+}
+
+/* ---------- layout ---------- */
+.community-page .c-main{ padding:clamp(40px, 6vw, 72px) 0 clamp(64px, 9vw, 110px); }
+.community-page .c-layout{ display:grid; gap:clamp(32px, 5vw, 56px); align-items:start; }
+@media(min-width:1000px){
+  .community-page .c-layout{ grid-template-columns:minmax(0,1fr) 300px; }
+  .community-page .c-side{ position:sticky; top:24px; }
+}
+
+/* ---------- avatars ----------
+   No uploads and no stock faces: the mark is the studio's eclipse, tinted by a
+   hash of the name so each voice is recognisable down the feed. */
+.community-page .c-avatar{
+  --hue:38;
+  display:grid; place-items:center;
+  width:42px; height:42px; flex-shrink:0;
+  border-radius:50%;
+  font-size:.82rem; letter-spacing:.02em; font-weight:500;
+  color:#120c04;
+  background:radial-gradient(circle at 34% 32%,
+    hsl(var(--hue) 78% 72%), hsl(var(--hue) 62% 42%) 72%, hsl(var(--hue) 55% 26%));
+  box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 0 16px hsl(var(--hue) 70% 50% / .28);
+}
+.community-page .c-avatar--sm{ width:32px; height:32px; font-size:.7rem; }
+
+/* ---------- composer ---------- */
+.community-page .c-composer{
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:linear-gradient(to bottom, rgba(214,163,74,.05), var(--card));
+  padding:clamp(20px, 3vw, 28px);
+  margin-bottom:32px;
+}
+.community-page .c-composer-head{
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:18px; font-weight:400;
+}
+.community-page .c-composer-title{ display:block; font-size:1.25rem; line-height:1.2; }
+.community-page .c-composer-sub{
+  display:block; font-size:.72rem; letter-spacing:.05em; color:var(--smoke); margin-top:2px;
+}
+
+/* the name reads as text until you touch it - no box shouting "form field" */
+.community-page .c-name-input{
+  background:transparent; border:none; border-bottom:1px dashed rgba(214,163,74,.45);
+  outline:none; color:var(--gold-bright);
+  font-size:.72rem; letter-spacing:.05em; padding:1px 2px; width:12ch;
+  transition:border-color .25s ease, background .25s ease;
+}
+.community-page .c-name-input:focus{
+  border-bottom-style:solid; border-bottom-color:var(--gold);
+  background:rgba(214,163,74,.07);
+}
+/* signed in, the name belongs to the account — it is shown, not asked for.
+   The input is sized to its content via the size attribute in community.js. */
+.community-page .c-name-input[readonly]{
+  border-bottom-color:transparent; cursor:default; width:auto;
+}
+.community-page .c-name-input[readonly]:focus{ background:transparent; }
+
+/* the shared .signed-in-only rule resolves to display:flex, which would break
+   this out of the sentence it sits in - outrank it with a longer selector */
+.community-page .c-name-edit{
+  font-size:.66rem; letter-spacing:.1em; color:var(--gold);
+  border-bottom:1px solid rgba(214,163,74,.4); margin-left:8px;
+}
+.is-authed .community-page .c-name-edit.signed-in-only{ display:inline !important; }
+.community-page .c-name-edit:hover{ color:var(--gold-bright); }
+
+.community-page .c-post-form{ display:flex; flex-direction:column; gap:16px; }
+.community-page .c-post-form textarea{
+  width:100%;
+  background:transparent;
+  border:1px solid rgba(255,255,255,.16);
+  outline:none;
+  padding:14px 16px;
+  font-family:inherit; font-size:.92rem; line-height:1.6; color:var(--bone);
+  resize:vertical; min-height:96px;
+  transition:border-color .3s ease, box-shadow .3s ease;
+}
+.community-page .c-post-form textarea:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(214,163,74,.1);
+}
+
+.community-page .c-post-actions{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+}
+.community-page .c-topic-picker{ display:flex; flex-wrap:wrap; gap:8px; }
+.community-page .c-topic{
+  border:1px solid rgba(255,255,255,.16);
+  color:var(--smoke);
+  font-size:.6rem; letter-spacing:.18em;
+  padding:8px 13px;
+  transition:border-color .25s ease, color .25s ease, background .25s ease;
+}
+.community-page .c-topic:hover{ color:var(--bone); border-color:rgba(255,255,255,.32); }
+.community-page .c-topic.is-on{
+  color:var(--gold-bright); border-color:var(--gold); background:rgba(214,163,74,.1);
+}
+
+.community-page .c-post-submit{ display:flex; align-items:center; gap:16px; margin-left:auto; }
+.community-page .c-count{ font-size:.68rem; color:var(--smoke); font-variant-numeric:tabular-nums; }
+.community-page .c-count.is-low{ color:var(--gold-bright); }
+.community-page .c-count.is-over{ color:#e08a72; }
+
+.community-page .c-error{ font-size:.75rem; color:#e08a72; min-height:1em; }
+
+/* ---------- filters ---------- */
+.community-page .c-filters{
+  display:flex; flex-wrap:wrap; gap:10px;
+  padding-bottom:20px; margin-bottom:24px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.community-page .c-filter{
+  font-size:.62rem; letter-spacing:.2em; color:var(--smoke);
+  padding:7px 2px; position:relative;
+  transition:color .25s ease;
+}
+.community-page .c-filter::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:1px;
+  background:var(--gold); transform:scaleX(0); transform-origin:left;
+  transition:transform .3s ease;
+}
+.community-page .c-filter:hover{ color:var(--bone); }
+.community-page .c-filter.is-on{ color:var(--gold); }
+.community-page .c-filter.is-on::after{ transform:scaleX(1); }
+.community-page .c-filter + .c-filter{ margin-left:12px; }
+
+/* ---------- posts ---------- */
+.community-page .c-feed{ display:flex; flex-direction:column; gap:20px; }
+
+.community-page .c-post{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:2px;
+  background:var(--card);
+  padding:clamp(18px, 2.6vw, 24px);
+  transition:border-color .3s ease, box-shadow .3s ease;
+  animation:cPostIn .5s cubic-bezier(.22,.85,.28,1) both;
+}
+.community-page .c-post:hover{
+  border-color:var(--line);
+  box-shadow:0 0 30px rgba(214,163,74,.07);
+}
+@keyframes cPostIn{
+  from{ opacity:0; transform:translateY(14px); }
+  to  { opacity:1; transform:translateY(0); }
+}
+
+.community-page .c-post-head{ display:flex; align-items:center; gap:13px; margin-bottom:14px; }
+.community-page .c-post-who{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.community-page .c-post-name{ font-size:.86rem; color:var(--bone); }
+.community-page .c-post-meta{ font-size:.66rem; letter-spacing:.06em; color:var(--smoke); }
+.community-page .c-post-meta .c-tag{ color:var(--gold); letter-spacing:.18em; font-size:.6rem; }
+
+.community-page .c-post-body{
+  font-size:.94rem; line-height:1.7; color:#ded5c2;
+  white-space:pre-wrap; overflow-wrap:anywhere;
+}
+
+.community-page .c-post-bar{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  margin-top:18px; padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+.community-page .c-act{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:.66rem; letter-spacing:.14em; color:var(--smoke);
+  padding:7px 11px; border:1px solid transparent; border-radius:2px;
+  transition:color .25s ease, border-color .25s ease, background .25s ease;
+}
+.community-page .c-act:hover{ color:var(--bone); border-color:rgba(255,255,255,.16); }
+.community-page .c-act svg{ flex-shrink:0; }
+.community-page .c-act .c-n{ font-variant-numeric:tabular-nums; }
+
+.community-page .c-act--like.is-on{
+  color:var(--gold-bright); border-color:rgba(214,163,74,.4); background:rgba(214,163,74,.08);
+}
+.community-page .c-act--like.is-on svg{ fill:currentColor; }
+/* one beat of light when a post is lit up */
+.community-page .c-act--like.is-on svg{ animation:cLike .45s cubic-bezier(.3,1.5,.5,1); }
+@keyframes cLike{ 0%{ transform:scale(1); } 45%{ transform:scale(1.35); } 100%{ transform:scale(1); } }
+
+.community-page .c-act--del{ margin-left:auto; }
+.community-page .c-act--del:hover{ color:#e08a72; border-color:rgba(224,138,114,.35); }
+
+/* ---------- comments ---------- */
+.community-page .c-thread{ margin-top:16px; display:none; flex-direction:column; gap:14px; }
+.community-page .c-thread.is-open{ display:flex; }
+
+.community-page .c-comment{
+  display:flex; gap:11px;
+  padding-left:14px;
+  border-left:1px solid rgba(214,163,74,.2);
+  animation:cPostIn .35s ease both;
+}
+.community-page .c-comment-body{ min-width:0; }
+.community-page .c-comment-name{ font-size:.78rem; color:var(--bone); }
+.community-page .c-comment-name span{ font-size:.64rem; color:var(--smoke); margin-left:8px; letter-spacing:.06em; }
+.community-page .c-comment-text{
+  font-size:.86rem; line-height:1.6; color:#cfc6b4; margin-top:3px;
+  white-space:pre-wrap; overflow-wrap:anywhere;
+}
+
+.community-page .c-comment-form{ display:flex; gap:10px; align-items:flex-start; padding-left:14px; }
+.community-page .c-comment-form input{
+  flex:1; min-width:0;
+  background:transparent; border:1px solid rgba(255,255,255,.14);
+  outline:none; padding:11px 14px; font-size:.85rem; color:var(--bone);
+  transition:border-color .3s ease;
+}
+.community-page .c-comment-form input:focus{ border-color:var(--gold); }
+.community-page .c-comment-form button{
+  border:1px solid var(--gold); color:var(--gold-bright);
+  font-size:.6rem; letter-spacing:.16em; padding:11px 15px; white-space:nowrap;
+  transition:background .3s ease, color .3s ease;
+}
+.community-page .c-comment-form button:hover{ background:var(--gold); color:var(--panel); }
+
+.community-page .c-empty{
+  display:none;
+  text-align:center; color:var(--smoke); font-size:.9rem;
+  padding:48px 16px; border:1px dashed rgba(255,255,255,.12);
+}
+.community-page .c-empty.is-on{ display:block; }
+
+/* ---------- sidebar ---------- */
+.community-page .c-side{ display:flex; flex-direction:column; gap:20px; }
+.community-page .c-side-card{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:2px;
+  padding:22px;
+}
+.community-page .c-side-card h3{
+  font-size:.62rem; letter-spacing:.26em; color:var(--gold); margin-bottom:16px;
+}
+.community-page .c-side-card p{ color:var(--smoke); font-size:.85rem; line-height:1.65; margin-bottom:18px; }
+.community-page .c-side-card--cta{ border-color:var(--line); background:linear-gradient(to bottom, rgba(214,163,74,.05), transparent); }
+
+.community-page .c-rules{ display:flex; flex-direction:column; gap:12px; }
+.community-page .c-rules li{
+  position:relative; padding-left:18px;
+  color:var(--smoke); font-size:.85rem; line-height:1.55;
+}
+.community-page .c-rules li::before{
+  content:''; position:absolute; left:0; top:.55em;
+  width:6px; height:6px; background:var(--gold); transform:rotate(45deg);
+}
+
+.community-page .c-topic-list{ display:flex; flex-direction:column; gap:11px; }
+.community-page .c-topic-list li{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  font-size:.72rem; letter-spacing:.16em; color:var(--smoke);
+  padding-bottom:11px; border-bottom:1px solid rgba(255,255,255,.06);
+}
+.community-page .c-topic-list li:last-child{ border-bottom:none; padding-bottom:0; }
+.community-page .c-topic-list b{
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.2rem; font-weight:500; color:var(--gold-bright); letter-spacing:0;
+  font-variant-numeric:lining-nums tabular-nums;
+}
+
+.community-page .c-local-note{
+  font-size:.7rem; line-height:1.6; color:rgba(168,157,137,.62);
+  padding-left:14px; border-left:1px solid rgba(255,255,255,.1);
+}
+
+@media(prefers-reduced-motion: reduce){
+  .community-page .c-hero-bg,
+  .community-page .c-post,
+  .community-page .c-comment,
+  .community-page .c-act--like.is-on svg{ animation:none !important; }
+}
+
+/* the sidebar cards are blocks, not rows — the shared .signed-in-only rule
+   resolves to display:flex, so it has to be outranked here */
+.is-authed .community-page .c-side-card.signed-in-only{ display:block !important; }
+
+.community-page .c-side-me{
+  display:flex; align-items:center; gap:13px; margin-bottom:20px;
+}
+.community-page .c-side-me-text{ min-width:0; }
+.community-page .c-side-me-text b{
+  display:block; font-size:.86rem; font-weight:400; color:var(--bone);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.community-page .c-side-me-text i{
+  display:block; font-style:normal; font-size:.7rem; color:var(--smoke); margin-top:3px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* ---------- read-only visitors ----------
+   The composer is a block with a stacked form inside it, so the shared
+   .signed-in-only rule (display:flex) has to be outranked here. */
+.is-authed .community-page .c-composer.signed-in-only{ display:block !important; }
+
+.community-page .c-guest-card{
+  display:flex; align-items:flex-start; gap:20px;
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:linear-gradient(to bottom, rgba(214,163,74,.06), var(--card));
+  padding:clamp(22px, 3vw, 30px);
+  margin-bottom:32px;
+}
+.community-page .c-guest-card h2{ font-size:1.3rem; line-height:1.2; margin-bottom:8px; }
+.community-page .c-guest-card p{
+  color:var(--smoke); font-size:.88rem; line-height:1.6; max-width:46ch;
+}
+.community-page .c-guest-actions{
+  display:flex; flex-wrap:wrap; gap:12px; margin-top:20px;
+}
+
+/* the studio mark, reused as the doorway motif */
+.community-page .c-guest-mark,
+.community-page .c-gate-mark{
+  flex-shrink:0;
+  aspect-ratio:var(--mark-ratio);
+  background:var(--mark) no-repeat center / contain;
+}
+.community-page .c-guest-mark{ width:54px; height:auto; margin:-6px 0 0 -6px; }
+.community-page .c-gate-mark{ width:68px; height:auto; margin:-8px auto 12px; display:block; }
+
+@media(max-width:560px){
+  .community-page .c-guest-card{ flex-direction:column; gap:16px; }
+  .community-page .c-guest-mark{ margin-top:0; }
+}
+
+/* the last readable post trails off into the gate */
+.community-page .c-post.is-cut{
+  -webkit-mask-image:linear-gradient(to bottom, #000 40%, rgba(0,0,0,.35) 78%, transparent 100%);
+          mask-image:linear-gradient(to bottom, #000 40%, rgba(0,0,0,.35) 78%, transparent 100%);
+}
+
+/* the static tally a visitor sees in place of the buttons */
+.community-page .c-counts{
+  display:flex; align-items:center; gap:8px;
+  font-size:.66rem; letter-spacing:.14em; color:rgba(168,157,137,.75);
+}
+.community-page .c-counts svg{ flex-shrink:0; }
+.community-page .c-counts svg:nth-of-type(2){ margin-left:14px; }
+
+/* ---------- the gate ---------- */
+.community-page .c-gate{
+  margin-top:-28px;              /* tucks under the faded card above it */
+  position:relative; z-index:1;
+  text-align:center;
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:linear-gradient(to bottom, rgba(214,163,74,.07), rgba(5,4,3,.9));
+  padding:clamp(34px, 5vw, 52px) clamp(22px, 4vw, 40px);
+}
+.community-page .c-gate h3{ font-size:1.55rem; line-height:1.25; margin-bottom:12px; }
+.community-page .c-gate p{
+  color:var(--smoke); font-size:.9rem; line-height:1.6;
+  max-width:44ch; margin:0 auto;
+}
+.community-page .c-gate p b{
+  font-family:'Cormorant Garamond', serif;
+  font-size:1.25rem; font-weight:500; color:var(--gold-bright);
+  font-variant-numeric:lining-nums tabular-nums;
+}
+.community-page .c-gate-actions{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:26px;
+}
+
+/* the hero plate settles straight into place on a return visit — see the
+   .no-intro note in style.css */
+.no-intro .community-page .c-hero-bg{
+  animation:none !important;
+  opacity:1; transform:none;
+}

@@ -8,6 +8,7 @@ if (missingEnvVars.length) {
   process.exit(1);
 }
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -41,7 +42,18 @@ const supabase = createClient(
 // Render sits behind a proxy; needed for express-rate-limit to see the real client IP
 app.set('trust proxy', 1);
 
-app.use(helmet());
+// script-src 'unsafe-inline' is needed because the frontend uses small inline
+// <script> blocks throughout; XSS protection instead relies on the frontend
+// rendering all user content via textContent, never innerHTML (see community.js)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'script-src': ["'self'", "'unsafe-inline'"],
+      'script-src-attr': null
+    }
+  }
+}));
 app.use(morgan('combined'));
 app.use(cors(process.env.FRONTEND_ORIGIN ? { origin: process.env.FRONTEND_ORIGIN } : {}));
 app.use(express.json({ limit: '1mb' }));
@@ -64,8 +76,11 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
+// Serves the frontend (index.html, css, js, images)
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Health check: also confirms the database is actually reachable
-app.get('/', async (req, res) => {
+app.get('/api/health', async (req, res) => {
   try {
     const { error } = await supabase.from('users').select('id', { count: 'exact', head: true });
 

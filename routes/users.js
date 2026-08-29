@@ -15,7 +15,7 @@ router.get('/me', authMiddleware, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, name, email, role, bio, avatar_url, created_at')
+      .select('id, name, email, role, bio, avatar_url, avatar_hue, created_at')
       .eq('id', req.user.id)
       .single();
 
@@ -31,16 +31,17 @@ router.get('/me', authMiddleware, async (req, res) => {
 router.put('/me', authMiddleware, [
   body('name').optional({ checkFalsy: true }).trim().notEmpty().isLength({ max: 100 }),
   body('bio').optional({ checkFalsy: true }).isLength({ max: 500 }),
-  body('avatar_url').optional({ checkFalsy: true }).isURL().withMessage('avatar_url must be a valid URL')
+  body('avatar_url').optional({ checkFalsy: true }).isURL().withMessage('avatar_url must be a valid URL'),
+  body('avatar_hue').optional({ nullable: true }).isInt({ min: 0, max: 359 }).withMessage('avatar_hue must be between 0 and 359').toInt()
 ], validate, async (req, res) => {
-  const { name, bio, avatar_url } = req.body;
+  const { name, bio, avatar_url, avatar_hue } = req.body;
 
   try {
     const { data, error } = await supabase
       .from('users')
-      .update({ name, bio, avatar_url })
+      .update({ name, bio, avatar_url, avatar_hue })
       .eq('id', req.user.id)
-      .select('id, name, email, role, bio, avatar_url, created_at');
+      .select('id, name, email, role, bio, avatar_url, avatar_hue, created_at');
 
     if (error) return res.status(400).json({ error: error.message });
 
