@@ -1,18 +1,13 @@
 /* ============================================================
    PROFILE SETTINGS
 
-   Reads and writes the real profile via the API. Notification
-   preferences are not backed by any real notification pipeline yet,
-   so they're kept local-only, in their own storage key (never on the
-   PUS user cache, which gets fully replaced by the server on every
-   refresh — anything not part of the API response would be wiped).
+   Reads and writes the real profile via the API.
    ============================================================ */
 (() => {
   'use strict';
 
   if (!window.PUS || !PUS.requireUser()) return;   // no session, no settings page
 
-  const PREFS_KEY = 'pus.prefs';
   const MAX_BIO = 140;
   // a warm spread across the site's gold range, plus a couple of cooler embers
   const HUES = [20, 28, 36, 44, 52, 12, 4, 340];
@@ -62,15 +57,6 @@
   const previewName = $('#previewName');
   const previewEmail = $('#previewEmail');
   const errorEl = $('#profileError');
-
-  /* ---------- local-only notification prefs ---------- */
-  function readPrefs() {
-    try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); }
-    catch (_) { return {}; }
-  }
-  function writePrefs(prefs) {
-    try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (_) {}
-  }
 
   /* ---------- live preview ---------- */
   function paintPreview() {
@@ -189,10 +175,6 @@
     emailEl.value = user.email;
     bioEl.value = user.bio || '';
 
-    const prefs = readPrefs();
-    $('#prefReleases').checked = prefs.releases !== false;   // default on
-    $('#prefReplies').checked = prefs.replies !== false;
-
     paintSwatches();
     paintPreview();
     syncBioCount();
@@ -231,19 +213,6 @@
     } catch (_) {
       errorEl.textContent = 'Could not reach the server. Please check your connection and try again.';
     }
-  });
-
-  /* preferences save on the spot — a checkbox with a Save button underneath
-     it is a small lie about when the change takes effect. Local-only:
-     there's no real notification pipeline behind these yet. */
-  ['#prefReleases', '#prefReplies'].forEach((sel) => {
-    $(sel).addEventListener('change', () => {
-      writePrefs({
-        releases: $('#prefReleases').checked,
-        replies: $('#prefReplies').checked
-      });
-      flash($('#savedNote'));
-    });
   });
 
   /* ---------- clear my contributions ---------- */
