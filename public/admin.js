@@ -149,6 +149,15 @@
       tr.appendChild(el('td', 'is-muted', timeAgo(c.created_at)));
 
       const actionsTd = el('td');
+      const actions = el('div', 'admin-actions');
+
+      if (c.user_id === PUS.get().id) {
+        const edit = el('button', null, 'EDIT');
+        edit.type = 'button';
+        edit.addEventListener('click', () => startEditContent(c));
+        actions.appendChild(edit);
+      }
+
       const del = el('button', 'is-danger', 'DELETE');
       del.type = 'button';
       del.addEventListener('click', async () => {
@@ -159,7 +168,8 @@
           loadAnalytics();
         } catch (err) { alert(err.message); }
       });
-      actionsTd.appendChild(del);
+      actions.appendChild(del);
+      actionsTd.appendChild(actions);
       tr.appendChild(actionsTd);
       body.appendChild(tr);
     });
@@ -251,6 +261,110 @@
       list.appendChild(li);
     });
   }
+
+  /* ---------- content library: create/edit form ---------- */
+  let editingId = null;
+
+  const cForm = $('#contentForm');
+  const cTitle = $('#cTitle');
+  const cType = $('#cType');
+  const cBody = $('#cBody');
+  const cMediaUrl = $('#cMediaUrl');
+  const cUploadField = $('#cUploadField');
+  const cFile = $('#cFile');
+  const cUploadBtn = $('#cUploadBtn');
+  const cUploadStatus = $('#cUploadStatus');
+  const cSubmitBtn = $('#cSubmitBtn');
+  const cCancelBtn = $('#cCancelBtn');
+  const cError = $('#cError');
+  const cFormTitle = $('#contentFormTitle');
+
+  function syncUploadFieldVisibility() {
+    cUploadField.hidden = cType.value !== 'music';
+  }
+  cType.addEventListener('change', syncUploadFieldVisibility);
+  syncUploadFieldVisibility();
+
+  cUploadBtn.addEventListener('click', async () => {
+    const file = cFile.files[0];
+    if (!file) { cUploadStatus.textContent = 'Choose a file first.'; return; }
+
+    cUploadStatus.textContent = 'Uploading…';
+    cUploadBtn.disabled = true;
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload/music', { method: 'POST', headers: authHeaders(), body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      cMediaUrl.value = data.url;
+      cUploadStatus.textContent = 'Uploaded — media URL filled in below.';
+    } catch (err) {
+      cUploadStatus.textContent = err.message;
+    } finally {
+      cUploadBtn.disabled = false;
+    }
+  });
+
+  function startEditContent(c) {
+    editingId = c.id;
+    cTitle.value = c.title;
+    cType.value = c.type;
+    cBody.value = c.body || '';
+    cMediaUrl.value = c.media_url || '';
+    syncUploadFieldVisibility();
+    cFormTitle.textContent = 'EDIT: ' + c.title;
+    cSubmitBtn.textContent = 'SAVE CHANGES';
+    cCancelBtn.hidden = false;
+    cError.textContent = '';
+    $('#contentLibrary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetContentForm() {
+    editingId = null;
+    cForm.reset();
+    syncUploadFieldVisibility();
+    cFormTitle.textContent = 'ADD BOOK, MUSIC OR RESOURCE';
+    cSubmitBtn.textContent = 'PUBLISH';
+    cCancelBtn.hidden = true;
+    cUploadStatus.textContent = '';
+    cError.textContent = '';
+  }
+
+  cCancelBtn.addEventListener('click', resetContentForm);
+
+  cForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = cTitle.value.trim();
+    if (!title) { cError.textContent = 'Title is required.'; return; }
+
+    const payload = {
+      title,
+      type: cType.value,
+      body: cBody.value.trim() || null,
+      media_url: cMediaUrl.value.trim() || null
+    };
+
+    cSubmitBtn.disabled = true;
+    try {
+      const url = editingId ? `/api/content/${editingId}` : '/api/content';
+      const res = await fetch(url, {
+        method: editingId ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not save content');
+
+      resetContentForm();
+      loadContent();
+      loadAnalytics();
+    } catch (err) {
+      cError.textContent = err.message;
+    } finally {
+      cSubmitBtn.disabled = false;
+    }
+  });
 
   /* ---------- boot ---------- */
   loadAnalytics();

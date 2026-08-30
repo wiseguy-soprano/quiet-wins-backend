@@ -129,6 +129,53 @@
         </div>
       </section>
 
+      <!-- ---------- content library (create/edit) ---------- -->
+      <section class="account-card" id="contentLibrary">
+        <h2 id="contentFormTitle">ADD BOOK, MUSIC OR RESOURCE</h2>
+        <p>Publish new site content, or edit anything you've published yourself.</p>
+
+        <form id="contentForm">
+          <div class="account-field">
+            <label for="cTitle">TITLE</label>
+            <input id="cTitle" type="text" maxlength="200" required placeholder="Chapter 3: The Storm and the Statue" />
+          </div>
+
+          <div class="account-field">
+            <label for="cType">TYPE</label>
+            <select id="cType">
+              <option value="blog">Blog</option>
+              <option value="music">Music</option>
+              <option value="resource">Resource</option>
+            </select>
+          </div>
+
+          <div class="account-field">
+            <label for="cBody">BODY / DESCRIPTION</label>
+            <textarea id="cBody" rows="4" maxlength="50000" placeholder="What is this?"></textarea>
+          </div>
+
+          <div class="account-field" id="cUploadField" hidden>
+            <label for="cFile">AUDIO FILE (mp3, wav, m4a, ogg — up to 50MB)</label>
+            <input id="cFile" type="file" accept="audio/*" />
+            <button type="button" class="btn-ghost" id="cUploadBtn" style="margin-top:8px;">UPLOAD FILE</button>
+            <span class="account-hint" id="cUploadStatus"></span>
+          </div>
+
+          <div class="account-field">
+            <label for="cMediaUrl">MEDIA URL</label>
+            <input id="cMediaUrl" type="url" placeholder="https://…" />
+            <span class="account-hint">For music, upload a file above to fill this in automatically — or paste any link directly.</span>
+          </div>
+
+          <div class="account-actions">
+            <button type="submit" class="btn-solid" id="cSubmitBtn">PUBLISH</button>
+            <button type="button" class="btn-ghost" id="cCancelBtn" hidden>CANCEL EDIT</button>
+            <span class="account-saved" id="cSavedNote" role="status">Saved.</span>
+          </div>
+          <p class="c-error" id="cError" role="alert" style="min-height:1em; font-size:.75rem; color:#e08a72; margin-top:10px;"></p>
+        </form>
+      </section>
+
       <!-- ---------- content moderation ---------- -->
       <section class="account-card">
         <h2>CONTENT MODERATION</h2>

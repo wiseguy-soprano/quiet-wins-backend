@@ -87,15 +87,16 @@ router.post('/', authMiddleware, [
 // UPDATE content (protected)
 router.put('/:id', authMiddleware, [
   body('title').optional({ checkFalsy: true }).trim().notEmpty().isLength({ max: 200 }),
+  body('type').optional({ checkFalsy: true }).isIn(CONTENT_TYPES).withMessage(`Type must be one of: ${CONTENT_TYPES.join(', ')}`),
   body('body').optional({ checkFalsy: true }).isLength({ max: 50000 }),
   body('media_url').optional({ checkFalsy: true }).isURL().withMessage('media_url must be a valid URL')
 ], validate, async (req, res) => {
-  const { title, body, media_url, status } = req.body;
+  const { title, type, body, media_url, status } = req.body;
 
   try {
     const { data, error } = await supabase
       .from('content')
-      .update({ title, body, media_url, status })
+      .update({ title, type, body, media_url, status })
       .eq('id', req.params.id)
       .eq('user_id', req.user.id)
       .select();
