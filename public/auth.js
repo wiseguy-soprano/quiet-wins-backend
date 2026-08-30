@@ -214,11 +214,26 @@
     });
   }
 
+  // best-effort analytics ping; never blocks or breaks the page
+  function logPageView() {
+    const path = location.pathname === '/' ? '/' : (location.pathname.split('/').pop() || 'index.html');
+    const token = PUS.token();
+    fetch('/api/analytics/pageview', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {})
+      },
+      body: JSON.stringify({ path })
+    }).catch(() => {});
+  }
+
   PUS.paint();
   decorateAccountLinks();
   wireMenu();
   wireMobileMenu();
   wireSignOut();
+  logPageView();
 
   // signing out in one tab should not leave another tab looking signed in
   window.addEventListener('storage', (e) => {
