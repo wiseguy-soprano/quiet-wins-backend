@@ -219,6 +219,40 @@
         </div>
       </section>
 
+      <!-- ---------- FAQ management ---------- -->
+      <section class="account-card" id="faqLibrary">
+        <h2 id="faqFormTitle">ADD FAQ</h2>
+        <p>Questions and answers shown on the contact page, in the order listed below.</p>
+
+        <form id="faqForm">
+          <div class="account-field">
+            <label for="faqQuestion">QUESTION</label>
+            <input id="faqQuestion" type="text" maxlength="300" required placeholder="How do I submit my work?" />
+          </div>
+
+          <div class="account-field">
+            <label for="faqAnswer">ANSWER</label>
+            <textarea id="faqAnswer" rows="4" maxlength="2000" required placeholder="Use the form above and someone from our team will follow up."></textarea>
+          </div>
+
+          <div class="account-actions">
+            <button type="submit" class="btn-solid" id="faqSubmitBtn">ADD</button>
+            <button type="button" class="btn-ghost" id="faqCancelBtn" hidden>CANCEL EDIT</button>
+            <span class="account-saved" id="faqSavedNote" role="status">Saved.</span>
+          </div>
+          <p class="c-error" id="faqError" role="alert" style="min-height:1em; font-size:.75rem; color:#e08a72; margin-top:10px;"></p>
+        </form>
+
+        <div class="admin-table-wrap" style="margin-top:24px;">
+          <table class="admin-table" id="faqTable">
+            <thead>
+              <tr><th>Question</th><th>Answer</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="faqBody"></tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- ---------- audit log ---------- -->
       <section class="account-card account-card--quiet">
         <h2>AUDIT LOG</h2>

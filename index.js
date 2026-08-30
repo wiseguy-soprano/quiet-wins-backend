@@ -31,6 +31,7 @@ const messageRoutes = require('./routes/messages');
 const noteRoutes = require('./routes/notes');
 const analyticsRoutes = require('./routes/analytics');
 const contactRoutes = require('./routes/contact');
+const faqRoutes = require('./routes/faqs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -77,6 +78,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/contact', contactLimiter, contactRoutes);
+app.use('/api/faqs', faqRoutes);
 
 // Serves the frontend (index.html, css, js, images)
 app.use(express.static(path.join(__dirname, 'public')));

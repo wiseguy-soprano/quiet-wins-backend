@@ -283,6 +283,135 @@
     } catch (err) { alert(err.message); }
   }
 
+  /* ---------- FAQ management ---------- */
+  let faqEditingId = null;
+  let faqCache = [];
+
+  const faqForm = $('#faqForm');
+  const faqQuestion = $('#faqQuestion');
+  const faqAnswer = $('#faqAnswer');
+  const faqSubmitBtn = $('#faqSubmitBtn');
+  const faqCancelBtn = $('#faqCancelBtn');
+  const faqError = $('#faqError');
+  const faqFormTitle = $('#faqFormTitle');
+  const faqSavedNote = $('#faqSavedNote');
+
+  function startEditFaq(f) {
+    faqEditingId = f.id;
+    faqQuestion.value = f.question;
+    faqAnswer.value = f.answer;
+    faqFormTitle.textContent = 'EDIT FAQ';
+    faqSubmitBtn.textContent = 'SAVE CHANGES';
+    faqCancelBtn.hidden = false;
+    faqError.textContent = '';
+    $('#faqLibrary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetFaqForm() {
+    faqEditingId = null;
+    faqForm.reset();
+    faqFormTitle.textContent = 'ADD FAQ';
+    faqSubmitBtn.textContent = 'ADD';
+    faqCancelBtn.hidden = true;
+    faqError.textContent = '';
+  }
+
+  faqCancelBtn.addEventListener('click', resetFaqForm);
+
+  faqForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = faqQuestion.value.trim();
+    const answer = faqAnswer.value.trim();
+    if (!question || !answer) { faqError.textContent = 'Question and answer are both required.'; return; }
+
+    faqSubmitBtn.disabled = true;
+    try {
+      const url = faqEditingId ? `/faqs/${faqEditingId}` : '/faqs';
+      await api(url, { method: faqEditingId ? 'PUT' : 'POST', body: JSON.stringify({ question, answer }) });
+
+      resetFaqForm();
+      loadFaqs();
+      faqSavedNote.classList.add('is-on');
+      setTimeout(() => faqSavedNote.classList.remove('is-on'), 1500);
+    } catch (err) {
+      faqError.textContent = err.message;
+    } finally {
+      faqSubmitBtn.disabled = false;
+    }
+  });
+
+  async function moveFaq(index, direction) {
+    const other = faqCache[index + direction];
+    const current = faqCache[index];
+    if (!other) return;
+    try {
+      await api(`/faqs/${current.id}`, { method: 'PUT', body: JSON.stringify({ sort_order: other.sort_order }) });
+      await api(`/faqs/${other.id}`, { method: 'PUT', body: JSON.stringify({ sort_order: current.sort_order }) });
+      loadFaqs();
+    } catch (err) { alert(err.message); }
+  }
+
+  async function deleteFaq(f) {
+    if (!confirm(`Delete "${f.question}"?`)) return;
+    try {
+      await api(`/faqs/${f.id}`, { method: 'DELETE' });
+      loadFaqs();
+    } catch (err) { alert(err.message); }
+  }
+
+  async function loadFaqs() {
+    const body = $('#faqBody');
+    body.textContent = '';
+    try {
+      ({ faqs: faqCache } = await api('/faqs'));
+    } catch (err) {
+      body.appendChild(el('tr')).appendChild(el('td', 'is-muted', 'Could not load FAQs: ' + err.message));
+      return;
+    }
+
+    if (!faqCache.length) {
+      const tr = el('tr');
+      tr.appendChild(el('td', 'is-muted', 'No FAQs yet.'));
+      body.appendChild(tr);
+      return;
+    }
+
+    faqCache.forEach((f, i) => {
+      const tr = el('tr');
+      tr.appendChild(el('td', null, f.question));
+      tr.appendChild(el('td', 'is-muted', f.answer.length > 140 ? f.answer.slice(0, 140) + '…' : f.answer));
+
+      const actionsTd = el('td');
+      const actions = el('div', 'admin-actions');
+
+      const up = el('button', null, '↑');
+      up.type = 'button';
+      up.disabled = i === 0;
+      up.addEventListener('click', () => moveFaq(i, -1));
+      actions.appendChild(up);
+
+      const down = el('button', null, '↓');
+      down.type = 'button';
+      down.disabled = i === faqCache.length - 1;
+      down.addEventListener('click', () => moveFaq(i, 1));
+      actions.appendChild(down);
+
+      const edit = el('button', null, 'EDIT');
+      edit.type = 'button';
+      edit.addEventListener('click', () => startEditFaq(f));
+      actions.appendChild(edit);
+
+      const del = el('button', 'is-danger', 'DELETE');
+      del.type = 'button';
+      del.addEventListener('click', () => deleteFaq(f));
+      actions.appendChild(del);
+
+      actionsTd.appendChild(actions);
+      tr.appendChild(actionsTd);
+      body.appendChild(tr);
+    });
+  }
+
   /* ---------- audit log ---------- */
   async function loadAuditLog() {
     const list = $('#auditLog');
@@ -423,5 +552,6 @@
   loadContent();
   loadReports();
   loadContactMessages();
+  loadFaqs();
   loadAuditLog();
 })();

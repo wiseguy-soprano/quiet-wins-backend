@@ -306,6 +306,100 @@ router.put('/contact-messages/:id', [
   }
 });
 
+// GET all FAQs, in display order
+router.get('/faqs', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({ faqs: data });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// CREATE a FAQ (added to the end of the display order)
+router.post('/faqs', [
+  body('question').trim().notEmpty().withMessage('Question is required').isLength({ max: 300 }),
+  body('answer').trim().notEmpty().withMessage('Answer is required').isLength({ max: 2000 })
+], validate, async (req, res) => {
+  try {
+    const { data: existing, error: fetchError } = await supabase
+      .from('faqs')
+      .select('sort_order')
+      .order('sort_order', { ascending: false })
+      .limit(1);
+
+    if (fetchError) return res.status(400).json({ error: fetchError.message });
+
+    const nextOrder = existing.length ? existing[0].sort_order + 1 : 0;
+
+    const { data, error } = await supabase
+      .from('faqs')
+      .insert([{ question: req.body.question, answer: req.body.answer, sort_order: nextOrder }])
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    await logAdminAction(req.user.id, 'create_faq', 'faq', data[0].id, req.body.question);
+
+    res.status(201).json({ message: 'FAQ created successfully', faq: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// UPDATE a FAQ's question, answer, and/or sort_order
+router.put('/faqs/:id', [
+  body('question').optional().trim().notEmpty().withMessage('Question cannot be empty').isLength({ max: 300 }),
+  body('answer').optional().trim().notEmpty().withMessage('Answer cannot be empty').isLength({ max: 2000 }),
+  body('sort_order').optional().isInt().withMessage('sort_order must be an integer')
+], validate, async (req, res) => {
+  try {
+    const updates = {};
+    if (req.body.question !== undefined) updates.question = req.body.question;
+    if (req.body.answer !== undefined) updates.answer = req.body.answer;
+    if (req.body.sort_order !== undefined) updates.sort_order = req.body.sort_order;
+
+    const { data, error } = await supabase
+      .from('faqs')
+      .update(updates)
+      .eq('id', req.params.id)
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    if (!data.length) return res.status(404).json({ error: 'FAQ not found' });
+
+    res.json({ message: 'FAQ updated successfully', faq: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// DELETE a FAQ
+router.delete('/faqs/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('faqs')
+      .delete()
+      .eq('id', req.params.id)
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    if (!data.length) return res.status(404).json({ error: 'FAQ not found' });
+
+    await logAdminAction(req.user.id, 'delete_faq', 'faq', req.params.id, data[0].question);
+
+    res.json({ message: 'FAQ deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // GET a specific user's login history
 router.get('/users/:id/login-history', async (req, res) => {
   try {
