@@ -75,6 +75,7 @@
   .btn-solid:hover{ background:var(--gold-bright); }
 
   .icon-ring{
+    position:relative;
     border:1px solid rgba(214,163,74,.5); color:var(--gold);
     display:flex; align-items:center; justify-content:center;
     transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
@@ -82,6 +83,11 @@
   .icon-ring:hover{ transform:translateY(-3px); border-color:var(--gold-bright); box-shadow:0 8px 22px rgba(214,163,74,.25); }
   .icon-ring--round{ border-radius:50%; width:36px; height:36px; }
   .icon-ring--square{ border-radius:4px; width:32px; height:32px; }
+  .icon-ring.has-unread::after{
+    content:''; position:absolute; top:1px; right:1px;
+    width:9px; height:9px; border-radius:50%;
+    background:var(--gold-bright); border:2px solid var(--ink, #0a0806);
+  }
 
   .reveal{ opacity:0; transform:translateY(22px); transition:opacity .8s ease, transform .8s ease; }
   .reveal.in{ opacity:1; transform:translateY(0); }

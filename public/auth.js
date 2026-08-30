@@ -221,6 +221,24 @@
     });
   }
 
+  // shows a dot on the inbox icon (if present on this page) when there's an
+  // unread message; best-effort, never blocks or breaks the page
+  function paintInboxBadge() {
+    const link = document.getElementById('inboxLink');
+    const token = PUS.token();
+    if (!link || !token) return;
+
+    fetch('/api/messages/conversations', { headers: { Authorization: 'Bearer ' + token } })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const me = PUS.get();
+        const hasUnread = data.conversations.some((c) => !c.is_read && c.recipient_id === (me && me.id));
+        link.classList.toggle('has-unread', hasUnread);
+      })
+      .catch(() => {});
+  }
+
   // best-effort analytics ping; never blocks or breaks the page
   function logPageView() {
     const path = location.pathname === '/' ? '/' : (location.pathname.split('/').pop() || 'index.html');
@@ -241,6 +259,7 @@
   wireMobileMenu();
   wireSignOut();
   logPageView();
+  paintInboxBadge();
 
   // signing out in one tab should not leave another tab looking signed in
   window.addEventListener('storage', (e) => {
