@@ -167,7 +167,16 @@
           <svg class="icon-pause" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" hidden><rect x="5" y="4" width="5" height="16"/><rect x="14" y="4" width="5" height="16"/></svg>
           <span class="listen-label">LISTEN NOW</span>
         </button>
-        <audio id="audioBeauty" preload="none" src="https://wpazbjlybdfvthhznzug.supabase.co/storage/v1/object/public/music/b3b4e900-5d30-4b30-9ff0-8066bf7c7f80.m4a"></audio>
+        <div class="track-progress">
+          <div class="track-progress-track" id="seekBeauty">
+            <div class="track-progress-fill" id="fillBeauty"></div>
+          </div>
+          <div class="track-progress-time">
+            <span id="timeBeautyCurrent">0:00</span>
+            <span id="timeBeautyDuration">0:00</span>
+          </div>
+        </div>
+        <audio id="audioBeauty" preload="metadata" src="https://wpazbjlybdfvthhznzug.supabase.co/storage/v1/object/public/music/b3b4e900-5d30-4b30-9ff0-8066bf7c7f80.m4a"></audio>
       </div>
     </article>
 
@@ -188,7 +197,16 @@
           <svg class="icon-pause" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" hidden><rect x="5" y="4" width="5" height="16"/><rect x="14" y="4" width="5" height="16"/></svg>
           <span class="listen-label">LISTEN NOW</span>
         </button>
-        <audio id="audioIAmThatIAm" preload="none" src="https://wpazbjlybdfvthhznzug.supabase.co/storage/v1/object/public/music/8f2e27c0-edd8-4852-9633-82659a7071a8.m4a"></audio>
+        <div class="track-progress">
+          <div class="track-progress-track" id="seekIAmThatIAm">
+            <div class="track-progress-fill" id="fillIAmThatIAm"></div>
+          </div>
+          <div class="track-progress-time">
+            <span id="timeIAmThatIAmCurrent">0:00</span>
+            <span id="timeIAmThatIAmDuration">0:00</span>
+          </div>
+        </div>
+        <audio id="audioIAmThatIAm" preload="metadata" src="https://wpazbjlybdfvthhznzug.supabase.co/storage/v1/object/public/music/8f2e27c0-edd8-4852-9633-82659a7071a8.m4a"></audio>
       </div>
     </article>
 
@@ -282,12 +300,23 @@
     document.querySelectorAll('.m-reveal:not(.in)').forEach(el => el.classList.add('in'));
   }, 1400);
 
-  function wireTrackPlayer(btnId, audioId) {
+  function formatTime(seconds) {
+    if (!isFinite(seconds) || seconds < 0) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  function wireTrackPlayer(btnId, audioId, trackId, fillId, curId, durId) {
     const btn = document.getElementById(btnId);
     const audio = document.getElementById(audioId);
     const iconPlay = btn.querySelector('.icon-play');
     const iconPause = btn.querySelector('.icon-pause');
     const label = btn.querySelector('.listen-label');
+    const track = document.getElementById(trackId);
+    const fill = document.getElementById(fillId);
+    const curEl = document.getElementById(curId);
+    const durEl = document.getElementById(durId);
 
     function setPlaying(isPlaying) {
       iconPlay.hidden = isPlaying;
@@ -303,10 +332,39 @@
     audio.addEventListener('play', () => setPlaying(true));
     audio.addEventListener('pause', () => setPlaying(false));
     audio.addEventListener('ended', () => setPlaying(false));
+
+    audio.addEventListener('loadedmetadata', () => { durEl.textContent = formatTime(audio.duration); });
+    audio.addEventListener('timeupdate', () => {
+      if (audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      curEl.textContent = formatTime(audio.currentTime);
+    });
+
+    let scrubbing = false;
+    function ratioFromEvent(e) {
+      const rect = track.getBoundingClientRect();
+      return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    }
+    function seekTo(ratio) {
+      if (!audio.duration) return;
+      audio.currentTime = ratio * audio.duration;
+      fill.style.width = (ratio * 100) + '%';
+      curEl.textContent = formatTime(audio.currentTime);
+    }
+    track.addEventListener('pointerdown', (e) => {
+      scrubbing = true;
+      track.classList.add('is-scrubbing');
+      track.setPointerCapture(e.pointerId);
+      seekTo(ratioFromEvent(e));
+    });
+    track.addEventListener('pointermove', (e) => { if (scrubbing) seekTo(ratioFromEvent(e)); });
+    ['pointerup', 'pointercancel'].forEach((ev) => track.addEventListener(ev, () => {
+      scrubbing = false;
+      track.classList.remove('is-scrubbing');
+    }));
   }
 
-  wireTrackPlayer('listenBeauty', 'audioBeauty');
-  wireTrackPlayer('listenIAmThatIAm', 'audioIAmThatIAm');
+  wireTrackPlayer('listenBeauty', 'audioBeauty', 'seekBeauty', 'fillBeauty', 'timeBeautyCurrent', 'timeBeautyDuration');
+  wireTrackPlayer('listenIAmThatIAm', 'audioIAmThatIAm', 'seekIAmThatIAm', 'fillIAmThatIAm', 'timeIAmThatIAmCurrent', 'timeIAmThatIAmDuration');
 </script>
 
 <script src="auth.js"></script>

@@ -247,6 +247,27 @@
 .music-page .listen svg{ transition:transform .25s ease; }
 .music-page .listen:hover svg{ transform:translateX(3px); }
 
+.music-page .track-progress{ margin-top:14px; }
+.music-page .track-progress-track{
+  position:relative; height:3px; border-radius:2px; cursor:pointer;
+  background:rgba(255,255,255,.14); touch-action:none;
+}
+.music-page .track-progress-fill{
+  position:relative; height:100%; width:0%; border-radius:2px;
+  background:var(--gold-bright);
+}
+.music-page .track-progress-fill::after{
+  content:''; position:absolute; right:-5px; top:50%; width:10px; height:10px;
+  border-radius:50%; background:var(--gold-bright); transform:translate(0,-50%);
+  opacity:0; transition:opacity .2s ease; box-shadow:0 0 6px rgba(214,163,74,.6);
+}
+.music-page .track-progress-track:hover .track-progress-fill::after,
+.music-page .track-progress-track.is-scrubbing .track-progress-fill::after{ opacity:1; }
+.music-page .track-progress-time{
+  display:flex; justify-content:space-between; margin-top:7px;
+  font-size:.66rem; letter-spacing:.08em; color:var(--smoke);
+}
+
 @media(max-width:720px){
   .music-page .track{ grid-template-columns:1fr 1fr; }
   .music-page .track-body{ grid-column:1 / -1; }
