@@ -265,6 +265,9 @@
 
 .community-page .c-act--del{ margin-left:auto; }
 .community-page .c-act--del:hover{ color:#e08a72; border-color:rgba(224,138,114,.35); }
+.community-page .c-act--report{ margin-left:auto; }
+.community-page .c-act--report:hover{ color:#e0b872; border-color:rgba(224,184,114,.35); }
+.community-page .c-act--report:disabled{ opacity:.55; }
 
 /* ---------- comments ---------- */
 .community-page .c-thread{ margin-top:16px; display:none; flex-direction:column; gap:14px; }
@@ -277,8 +280,14 @@
   animation:cPostIn .35s ease both;
 }
 .community-page .c-comment-body{ min-width:0; }
-.community-page .c-comment-name{ font-size:.78rem; color:var(--bone); }
+.community-page .c-comment-name{ font-size:.78rem; color:var(--bone); display:flex; align-items:baseline; }
 .community-page .c-comment-name span{ font-size:.64rem; color:var(--smoke); margin-left:8px; letter-spacing:.06em; }
+.community-page .c-comment-report{
+  font-size:.64rem; letter-spacing:.06em; color:var(--smoke);
+  margin-left:auto; padding:2px 6px; opacity:.7;
+}
+.community-page .c-comment-report:hover{ color:#e0b872; opacity:1; }
+.community-page .c-comment-report:disabled{ opacity:.4; }
 .community-page .c-comment-text{
   font-size:.86rem; line-height:1.6; color:#cfc6b4; margin-top:3px;
   white-space:pre-wrap; overflow-wrap:anywhere;

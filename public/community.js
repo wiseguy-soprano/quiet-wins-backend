@@ -139,6 +139,7 @@
   const SUN = ['M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z', 'M12 1.8v2.4M12 19.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M1.8 12h2.4M19.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7'];
   const SPEECH = ['M20 14.5a2.5 2.5 0 01-2.5 2.5H8l-4 3.5V5.5A2.5 2.5 0 016.5 3h11A2.5 2.5 0 0120 5.5z'];
   const TRASH = ['M4 6h16M9 6V4.5A1.5 1.5 0 0110.5 3h3A1.5 1.5 0 0115 4.5V6M6.5 6l.8 13a1.5 1.5 0 001.5 1.4h6.4a1.5 1.5 0 001.5-1.4l.8-13'];
+  const FLAG = ['M5 21V4M5 4h13l-3 4 3 4H5'];
 
   // signed in, the account owns the name; signed out, the field does
   function account() {
@@ -250,6 +251,13 @@
       del.appendChild(icon(TRASH, { size: 14 }));
       del.append(' DELETE');
       bar.appendChild(del);
+    } else {
+      const report = el('button', 'c-act c-act--report');
+      report.type = 'button';
+      report.dataset.act = 'report-post';
+      report.appendChild(icon(FLAG, { size: 14 }));
+      report.append(' REPORT');
+      bar.appendChild(report);
     }
     card.appendChild(bar);
 
@@ -276,10 +284,17 @@
 
   function commentNode(c) {
     const row = el('div', 'c-comment');
+    row.dataset.commentId = c.id;
     row.appendChild(avatarFor(c.hue, c.name, true));
     const body = el('div', 'c-comment-body');
     const nm = el('div', 'c-comment-name', c.name);
     nm.appendChild(el('span', null, timeAgo(c.createdAt)));
+    if (!c.mine) {
+      const report = el('button', 'c-comment-report', 'Report');
+      report.type = 'button';
+      report.dataset.act = 'report-comment';
+      nm.appendChild(report);
+    }
     body.appendChild(nm);
     body.appendChild(el('p', 'c-comment-text', c.text));
     row.appendChild(body);
@@ -466,7 +481,37 @@
         render();
       }
     }
+
+    if (btn.dataset.act === 'report-post') {
+      submitReport(btn, 'content', post.id);
+    }
+
+    if (btn.dataset.act === 'report-comment') {
+      const commentId = btn.closest('.c-comment')?.dataset.commentId;
+      if (commentId) submitReport(btn, 'comment', commentId);
+    }
   });
+
+  async function submitReport(btn, targetType, targetId) {
+    const reason = prompt('What should the studio team know about this?');
+    if (!reason || !reason.trim()) return;
+
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ target_type: targetType, target_id: targetId, reason: reason.trim() })
+      });
+      if (res.ok) {
+        btn.textContent = targetType === 'content' ? ' REPORTED' : 'Reported';
+      } else {
+        btn.disabled = false;
+      }
+    } catch (_) {
+      btn.disabled = false;
+    }
+  }
 
   feedEl.addEventListener('submit', async (e) => {
     const form = e.target.closest('[data-act="comment"]');
