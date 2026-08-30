@@ -14,7 +14,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { createClient } = require('@supabase/supabase-js');
-const { apiLimiter, authLimiter } = require('./middleware/rateLimit');
+const { apiLimiter, authLimiter, contactLimiter } = require('./middleware/rateLimit');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const contentRoutes = require('./routes/content');
@@ -30,6 +30,7 @@ const reportRoutes = require('./routes/reports');
 const messageRoutes = require('./routes/messages');
 const noteRoutes = require('./routes/notes');
 const analyticsRoutes = require('./routes/analytics');
+const contactRoutes = require('./routes/contact');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -75,6 +76,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/contact', contactLimiter, contactRoutes);
 
 // Serves the frontend (index.html, css, js, images)
 app.use(express.static(path.join(__dirname, 'public')));

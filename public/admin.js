@@ -232,6 +232,57 @@
     } catch (err) { alert(err.message); }
   }
 
+  /* ---------- contact messages ---------- */
+  async function loadContactMessages() {
+    const body = $('#contactBody');
+    body.textContent = '';
+    let contactMessages;
+    try {
+      ({ contactMessages } = await api('/contact-messages'));
+    } catch (err) {
+      body.appendChild(el('tr')).appendChild(el('td', 'is-muted', 'Could not load messages: ' + err.message));
+      return;
+    }
+
+    if (!contactMessages.length) {
+      const tr = el('tr');
+      tr.appendChild(el('td', 'is-muted', 'No messages yet.'));
+      body.appendChild(tr);
+      return;
+    }
+
+    contactMessages.forEach((c) => {
+      const tr = el('tr');
+      const fromTd = el('td');
+      fromTd.appendChild(el('div', null, c.name));
+      fromTd.appendChild(el('div', 'is-muted', c.email));
+      tr.appendChild(fromTd);
+      tr.appendChild(el('td', null, c.subject || '—'));
+      tr.appendChild(el('td', 'is-muted', c.message.length > 140 ? c.message.slice(0, 140) + '…' : c.message));
+      tr.appendChild(el('td', 'is-muted', timeAgo(c.created_at)));
+
+      const statusTd = el('td');
+      statusTd.appendChild(el('span', 'admin-badge' + (!c.is_read ? ' is-pending' : ''), c.is_read ? 'read' : 'unread'));
+      tr.appendChild(statusTd);
+
+      const actionsTd = el('td');
+      const toggle = el('button', null, c.is_read ? 'MARK UNREAD' : 'MARK READ');
+      toggle.type = 'button';
+      toggle.addEventListener('click', () => updateContactMessage(c.id, !c.is_read));
+      actionsTd.appendChild(toggle);
+      tr.appendChild(actionsTd);
+
+      body.appendChild(tr);
+    });
+  }
+
+  async function updateContactMessage(id, is_read) {
+    try {
+      await api(`/contact-messages/${id}`, { method: 'PUT', body: JSON.stringify({ is_read }) });
+      loadContactMessages();
+    } catch (err) { alert(err.message); }
+  }
+
   /* ---------- audit log ---------- */
   async function loadAuditLog() {
     const list = $('#auditLog');
@@ -371,5 +422,6 @@
   loadUsers();
   loadContent();
   loadReports();
+  loadContactMessages();
   loadAuditLog();
 })();

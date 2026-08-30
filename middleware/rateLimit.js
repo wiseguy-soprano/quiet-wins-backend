@@ -18,4 +18,13 @@ const authLimiter = rateLimit({
   message: { error: 'Too many attempts, please try again later' }
 });
 
-module.exports = { apiLimiter, authLimiter };
+// Public, unauthenticated contact form — keep it tight to blunt spam.
+const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many messages sent, please try again later' }
+});
+
+module.exports = { apiLimiter, authLimiter, contactLimiter };

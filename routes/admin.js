@@ -270,6 +270,42 @@ router.put('/reports/:id', [
   }
 });
 
+// GET contact form submissions
+router.get('/contact-messages', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('contact_messages')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({ contactMessages: data });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// MARK a contact message read/unread
+router.put('/contact-messages/:id', [
+  body('is_read').isBoolean().withMessage('is_read must be a boolean')
+], validate, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('contact_messages')
+      .update({ is_read: req.body.is_read })
+      .eq('id', req.params.id)
+      .select();
+
+    if (error) return res.status(400).json({ error: error.message });
+    if (!data.length) return res.status(404).json({ error: 'Message not found' });
+
+    res.json({ message: 'Updated successfully', contactMessage: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // GET a specific user's login history
 router.get('/users/:id/login-history', async (req, res) => {
   try {
