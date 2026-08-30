@@ -28,6 +28,13 @@
   const me = PUS.get();
   let activeId = null;
   let activeName = '';
+  let renderedIds = new Set();
+  let threadPollTimer = null;
+  let listPollTimer = null;
+  let threadOpenState = false; // true once a thread is open and visible (false again after "back" on mobile)
+
+  const THREAD_POLL_MS = 3000;
+  const LIST_POLL_MS = 15000;
 
   function authHeaders() {
     return { Authorization: 'Bearer ' + PUS.token() };
@@ -76,12 +83,12 @@
   }
 
   /* ---------- conversation list ---------- */
-  async function loadConversations() {
-    status.textContent = 'Loading…';
+  async function loadConversations(silent) {
+    if (!silent) status.textContent = 'Loading…';
     try {
       const res = await fetch('/api/messages/conversations', { headers: authHeaders() });
       const data = await res.json();
-      if (!res.ok) { status.textContent = data.error || 'Something went wrong.'; return; }
+      if (!res.ok) { if (!silent) status.textContent = data.error || 'Something went wrong.'; return; }
 
       list.textContent = '';
       data.conversations.forEach((msg) => {
@@ -112,7 +119,7 @@
 
       status.textContent = data.conversations.length ? '' : 'No conversations yet.';
     } catch (_) {
-      status.textContent = 'Could not reach the server. Please check your connection and try again.';
+      if (!silent) status.textContent = 'Could not reach the server. Please check your connection and try again.';
     }
   }
 
@@ -127,6 +134,7 @@
   async function openThread(userId, name) {
     activeId = userId;
     activeName = name;
+    renderedIds = new Set();
     layout.classList.add('thread-open'); // below the mobile breakpoint, switches to full-screen thread
 
     document.querySelectorAll('.messages-list-item').forEach((li) => {
@@ -149,18 +157,70 @@
       if (!data.messages.length) {
         threadMessages.appendChild(el('p', 'account-hint', `Start the conversation with ${name}.`));
       } else {
-        data.messages.forEach((msg) => threadMessages.appendChild(messageBubble(msg)));
+        data.messages.forEach((msg) => { renderedIds.add(msg.id); threadMessages.appendChild(messageBubble(msg)); });
         threadMessages.scrollTop = threadMessages.scrollHeight;
       }
 
-      loadConversations(); // refresh unread state / ordering now that this thread's been read
+      loadConversations(true); // refresh unread state / ordering now that this thread's been read
+      threadOpenState = true;
+      startThreadPoll();
     } catch (_) {
       threadMessages.textContent = 'Could not reach the server. Please check your connection and try again.';
     }
   }
 
+  /* ---------- live-ish updates: short polling, paused while the tab is hidden ---------- */
+  function stopThreadPoll() {
+    if (threadPollTimer) { clearInterval(threadPollTimer); threadPollTimer = null; }
+  }
+  function startThreadPoll() {
+    stopThreadPoll();
+    threadPollTimer = setInterval(pollThread, THREAD_POLL_MS);
+  }
+  function stopListPoll() {
+    if (listPollTimer) { clearInterval(listPollTimer); listPollTimer = null; }
+  }
+  function startListPoll() {
+    stopListPoll();
+    listPollTimer = setInterval(() => loadConversations(true), LIST_POLL_MS);
+  }
+
+  async function pollThread() {
+    if (!activeId) return;
+    try {
+      const res = await fetch('/api/messages/' + activeId, { headers: authHeaders() });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const incoming = data.messages.filter((msg) => !renderedIds.has(msg.id));
+      if (!incoming.length) return;
+
+      const nearBottom = threadMessages.scrollHeight - threadMessages.scrollTop - threadMessages.clientHeight < 80;
+      if (renderedIds.size === 0) threadMessages.textContent = ''; // clear the "start the conversation" placeholder
+
+      incoming.forEach((msg) => { renderedIds.add(msg.id); threadMessages.appendChild(messageBubble(msg)); });
+      if (nearBottom) threadMessages.scrollTop = threadMessages.scrollHeight;
+
+      loadConversations(true);
+    } catch (_) {
+      // transient network hiccup during background polling — just try again next cycle
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopThreadPoll();
+      stopListPoll();
+    } else {
+      startListPoll();
+      if (threadOpenState) startThreadPoll();
+    }
+  });
+
   threadBack.addEventListener('click', () => {
     layout.classList.remove('thread-open'); // back to the conversation list on mobile
+    threadOpenState = false;
+    stopThreadPoll();
   });
 
   threadForm.addEventListener('submit', async (e) => {
@@ -181,9 +241,11 @@
 
       threadError.textContent = '';
       threadInput.value = '';
+      if (renderedIds.size === 0) threadMessages.textContent = ''; // clear the "start the conversation" placeholder
+      renderedIds.add(data.data.id);
       threadMessages.appendChild(messageBubble(data.data));
       threadMessages.scrollTop = threadMessages.scrollHeight;
-      loadConversations();
+      loadConversations(true);
     } catch (_) {
       threadError.textContent = 'Could not reach the server. Please check your connection and try again.';
     } finally {
@@ -194,6 +256,7 @@
   /* ---------- boot ---------- */
   async function boot() {
     await loadConversations();
+    startListPoll();
 
     const params = new URLSearchParams(location.search);
     const withId = params.get('with');
