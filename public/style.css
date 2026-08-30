@@ -684,6 +684,11 @@
   .is-authed .signed-out-only{ display:none !important; }
   .is-authed .signed-in-only{ display:flex !important; }
 
+  /* admin-only chrome: toggled by JS once the profile loads (role isn't
+     known before then), so a brief flash is possible but low-stakes here */
+  .admin-only{ display:none !important; }
+  .is-admin .admin-only{ display:flex !important; }
+
   /* ---------- Account menu ---------- */
   .account-menu{ position:relative; }
 
@@ -751,6 +756,7 @@
     transition:background .25s ease, color .25s ease;
   }
   .account-pop a:hover, .account-pop button:hover{ background:rgba(214,163,74,.1); color:var(--bone); }
+  .is-admin .account-pop .admin-only{ display:block !important; }
   .account-pop hr{ border:none; border-top:1px solid rgba(255,255,255,.08); margin:6px 0; }
   .account-pop [data-signout]{ color:var(--gold); }
 
@@ -849,6 +855,49 @@
     font-variant-numeric:lining-nums tabular-nums;
   }
   .account-stat span{ font-size:.78rem; color:var(--smoke); }
+
+  .admin-stat-row{ display:flex; flex-wrap:wrap; gap:28px; margin-bottom:12px; }
+  #topPagesLine{ color:var(--smoke); font-size:.78rem; }
+
+  .admin-table-wrap{ overflow-x:auto; margin-top:8px; }
+  .admin-table{ width:100%; border-collapse:collapse; font-size:.78rem; }
+  .admin-table th{
+    text-align:left; padding:10px 12px; color:var(--gold);
+    letter-spacing:.1em; font-size:.68rem; text-transform:uppercase;
+    border-bottom:1px solid rgba(255,255,255,.1); white-space:nowrap;
+  }
+  .admin-table td{
+    padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06);
+    color:var(--bone); vertical-align:middle;
+  }
+  .admin-table tr:last-child td{ border-bottom:none; }
+  .admin-table td.is-muted{ color:var(--smoke); }
+  .admin-table .admin-actions{ display:flex; flex-wrap:wrap; gap:6px; }
+  .admin-table button{
+    font-size:.68rem; letter-spacing:.05em; padding:5px 10px;
+    border:1px solid rgba(255,255,255,.14); border-radius:6px; color:var(--smoke);
+    background:transparent; white-space:nowrap;
+  }
+  .admin-table button:hover{ border-color:var(--gold-dim); color:var(--bone); }
+  .admin-table button.is-danger{ border-color:#6f2e26; color:#e08a72; }
+  .admin-table button.is-danger:hover{ background:rgba(224,138,114,.1); }
+
+  .admin-badge{
+    display:inline-block; padding:3px 9px; border-radius:999px; font-size:.68rem;
+    letter-spacing:.06em; border:1px solid rgba(255,255,255,.12); color:var(--smoke);
+  }
+  .admin-badge.is-admin-role{ border-color:var(--gold-dim); color:var(--gold-bright); }
+  .admin-badge.is-inactive{ border-color:#6f2e26; color:#e08a72; }
+  .admin-badge.is-pending{ border-color:var(--gold-dim); color:var(--gold); }
+
+  .admin-log{ list-style:none; padding:0; margin:0; font-size:.78rem; }
+  .admin-log li{
+    padding:9px 0; border-bottom:1px solid rgba(255,255,255,.06);
+    color:var(--smoke); display:flex; justify-content:space-between; gap:12px;
+  }
+  .admin-log li:last-child{ border-bottom:none; }
+  .admin-log .admin-log-who{ color:var(--bone); }
+  .admin-log time{ white-space:nowrap; color:var(--smoke); font-size:.7rem; }
 
   .account-badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
   .account-badge{

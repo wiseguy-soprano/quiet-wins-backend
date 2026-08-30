@@ -103,6 +103,7 @@
     paint() {
       const u = PUS.get();
       document.documentElement.classList.toggle('is-authed', !!u);
+      document.documentElement.classList.toggle('is-admin', !!u && u.role === 'admin');
       if (!u) return;
 
       const hue = PUS.hueOf(u);
@@ -131,6 +132,12 @@
     // account: no session, no settings page
     requireUser(to = 'signin.html') {
       if (!PUS.get()) { location.replace(to); return false; }
+      return true;
+    },
+    // admin pages: no session or not an admin, no entry
+    requireAdmin(to = 'index.html') {
+      const u = PUS.get();
+      if (!u || u.role !== 'admin') { location.replace(to); return false; }
       return true;
     }
   };

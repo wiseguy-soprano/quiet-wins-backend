@@ -130,7 +130,7 @@ router.get('/content', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('content')
-      .select('*')
+      .select('*, author:users(name, email)')
       .order('created_at', { ascending: false });
 
     if (error) return res.status(400).json({ error: error.message });
@@ -229,7 +229,10 @@ router.get('/reports', async (req, res) => {
   const { status } = req.query;
 
   try {
-    let query = supabase.from('reports').select('*').order('created_at', { ascending: false });
+    let query = supabase
+      .from('reports')
+      .select('*, reporter:users(name, email)')
+      .order('created_at', { ascending: false });
 
     if (status) {
       query = query.eq('status', status);
