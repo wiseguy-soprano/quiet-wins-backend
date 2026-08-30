@@ -17,6 +17,11 @@
     --mark-ratio:256 / 242;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
+  /* the hidden attribute must always win over a class's own display value —
+     otherwise toggling .hidden via JS on an element with e.g. display:flex
+     silently does nothing, since a class selector outranks the UA [hidden]
+     rule in the cascade */
+  [hidden]{ display:none !important; }
   html{ scroll-behavior:smooth; }
   body{
     background:var(--void);
@@ -962,8 +967,32 @@
     display:grid; grid-template-columns:300px 1fr; gap:20px; margin-top:8px;
     min-height:460px;
   }
+
+  .messages-back{
+    display:none; flex-shrink:0;
+    background:transparent; border:none; color:var(--gold); padding:6px;
+    margin:-6px 0 -6px -6px;
+  }
+  .messages-back:hover{ color:var(--gold-bright); }
+
+  /* Below the breakpoint, list and thread are two full-screen views rather
+     than a stacked column — a stacked layout put the reply input far below
+     the (potentially long) conversation list, awkward to reach and easy to
+     mistake for broken. The thread becomes a fixed full-viewport panel with
+     its own internal scroll, so the input stays pinned at the bottom no
+     matter how tall the message history is — same pattern as a phone's
+     native messaging app. */
   @media (max-width: 760px){
-    .messages-layout{ grid-template-columns:1fr; }
+    .messages-layout{ grid-template-columns:1fr; position:relative; }
+    .messages-back{ display:inline-flex; }
+    .messages-thread-pane{ display:none; }
+    .messages-layout.thread-open .messages-list-pane{ display:none; }
+    .messages-layout.thread-open .messages-thread-pane{
+      display:flex; position:fixed; inset:0; z-index:60;
+      border-radius:0; border:none; background:#0a0806; height:100dvh;
+    }
+    .messages-layout.thread-open .messages-thread{ height:100%; }
+    .messages-layout.thread-open .messages-thread-body{ min-height:0; max-height:none; }
   }
 
   .messages-list-pane{

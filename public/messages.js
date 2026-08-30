@@ -12,6 +12,7 @@
   if (!window.PUS || !PUS.requireUser()) return;
 
   const $ = (s) => document.querySelector(s);
+  const layout = $('.messages-layout');
   const list = $('#conversationList');
   const status = $('#conversationsStatus');
   const threadEmpty = $('#threadEmpty');
@@ -22,6 +23,7 @@
   const threadForm = $('#threadForm');
   const threadInput = $('#threadInput');
   const threadError = $('#threadError');
+  const threadBack = $('#threadBack');
 
   const me = PUS.get();
   let activeId = null;
@@ -125,6 +127,7 @@
   async function openThread(userId, name) {
     activeId = userId;
     activeName = name;
+    layout.classList.add('thread-open'); // below the mobile breakpoint, switches to full-screen thread
 
     document.querySelectorAll('.messages-list-item').forEach((li) => {
       li.classList.toggle('is-active', li.dataset.userId === userId);
@@ -155,6 +158,10 @@
       threadMessages.textContent = 'Could not reach the server. Please check your connection and try again.';
     }
   }
+
+  threadBack.addEventListener('click', () => {
+    layout.classList.remove('thread-open'); // back to the conversation list on mobile
+  });
 
   threadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
