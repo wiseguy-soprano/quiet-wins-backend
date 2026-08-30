@@ -899,6 +899,36 @@
   .admin-log .admin-log-who{ color:var(--bone); }
   .admin-log time{ white-space:nowrap; color:var(--smoke); font-size:.7rem; }
 
+  /* ---------- search ---------- */
+  .search-form{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;
+  }
+  .search-form input, .search-form select{
+    background:transparent; border:1px solid rgba(255,255,255,.2); outline:none;
+    padding:13px 16px; font-family:inherit; font-size:.9rem; color:var(--bone);
+    transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  .search-form input{ flex:1 1 260px; }
+  .search-form select{ flex:0 0 auto; }
+  .search-form input:focus, .search-form select:focus{
+    border-color:var(--gold); box-shadow:0 0 0 3px rgba(214,163,74,.12);
+  }
+
+  .search-results{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:16px; margin-top:24px;
+  }
+  .search-card{
+    border:1px solid rgba(255,255,255,.08); border-radius:10px;
+    padding:18px; background:rgba(255,255,255,.012);
+  }
+  .search-card-head{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+  .search-card h3{ font-size:1rem; color:var(--bone); font-weight:500; margin-bottom:8px; }
+  .search-card-body{ font-size:.8rem; color:var(--smoke); line-height:1.6; }
+  .search-card-foot{ margin-top:12px; }
+  .search-card-foot a{ font-size:.76rem; color:var(--gold); }
+  .search-card-foot a:hover{ color:var(--gold-bright); }
+
   .account-badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
   .account-badge{
     display:flex; align-items:center; gap:8px;

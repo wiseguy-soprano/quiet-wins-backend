@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Search — Parallel Universe Studios</title>
+<meta name="description" content="Search books, music, resources and the Reading Room." />
+<script>try{if(localStorage.getItem('pus.user'))document.documentElement.classList.add('is-authed')}catch(e){}</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="stars"></div>
+<div class="grain"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="wrap">
+    <div class="header-row">
+
+      <a href="index.html" class="logo">
+        <div class="eclipse eclipse--sm"><div class="corona"></div></div>
+        <div>
+          <div class="serif logo-text-1 bone">PARALLEL</div>
+          <div class="serif logo-text-2 bone">UNIVERSE</div>
+          <div class="logo-sub">— STUDIOS —</div>
+        </div>
+      </a>
+
+      <nav class="nav-desktop">
+        <a href="index.html">HOME</a>
+        <a href="books.html">BOOKS</a>
+        <a href="music.html">MUSIC</a>
+        <a href="community.html">COMMUNITY</a>
+        <a href="contact.html">CONTACT</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="community.html" class="btn-ghost signed-out-only">JOIN OUR COMMUNITY</a>
+        <a href="signin.html" class="signin-link signed-out-only">SIGN IN</a>
+        <a href="signin.html" class="icon-ring icon-ring--round signed-out-only" aria-label="Account">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        </a>
+
+        <div class="account-menu signed-in-only">
+          <button type="button" class="account-btn" id="accountBtn" aria-expanded="false" aria-haspopup="true">
+            <span class="account-avatar" data-avatar aria-hidden="true"></span>
+            <span class="account-name" data-name>Account</span>
+            <svg class="account-caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="account-pop" id="accountPop" hidden>
+            <div class="account-pop-head">
+              <span class="account-avatar account-avatar--lg" data-avatar aria-hidden="true"></span>
+              <div>
+                <span class="account-pop-name" data-name></span>
+                <span class="account-pop-mail" data-email></span>
+              </div>
+            </div>
+            <a href="account.html">Profile settings</a>
+            <a href="community.html">The Reading Room</a>
+            <a href="admin.html" class="admin-only">Admin panel</a>
+            <hr />
+            <button type="button" data-signout>Sign out</button>
+          </div>
+        </div>
+      </div>
+
+      <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+        <span class="menu-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      </button>
+    </div>
+
+    <nav id="mobileNav" class="mobile-nav">
+      <a href="index.html">HOME</a>
+      <a href="books.html">BOOKS</a>
+      <a href="music.html">MUSIC</a>
+      <a href="community.html">COMMUNITY</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="signin.html" class="signed-out-only">SIGN IN</a>
+      <a href="signup.html" class="signed-out-only">SIGN UP</a>
+      <a href="account.html" class="signed-in-only">PROFILE SETTINGS</a>
+      <a href="admin.html" class="admin-only">ADMIN PANEL</a>
+      <button type="button" class="mobile-signout signed-in-only" data-signout>SIGN OUT</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= SEARCH ================= -->
+<main class="page-section">
+  <div class="wrap">
+
+    <div class="account-page-head">
+      <div class="kicker">SEARCH</div>
+      <h1 class="serif bone">Find something</h1>
+      <p>Books, music, resources and posts from the Reading Room.</p>
+    </div>
+
+    <form id="searchForm" class="search-form">
+      <input id="searchInput" type="search" placeholder="Search Quiet Wins…" autocomplete="off" autofocus />
+      <select id="searchType">
+        <option value="">All types</option>
+        <option value="blog">Blog</option>
+        <option value="music">Music</option>
+        <option value="resource">Resource</option>
+        <option value="community">Community</option>
+      </select>
+      <button type="submit" class="btn-solid">SEARCH</button>
+    </form>
+
+    <p id="searchStatus" class="account-hint" style="margin-top:18px;"></p>
+    <div id="searchResults" class="search-results"></div>
+
+  </div>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <a href="index.html" class="footer-logo">
+      <div class="eclipse eclipse--foot"><div class="corona"></div></div>
+      <span class="bone">PARALLEL UNIVERSE STUDIOS</span>
+    </a>
+
+    <nav class="footer-nav">
+      <a href="books.html">BOOKS</a>
+      <a href="music.html">MUSIC</a>
+      <a href="community.html">COMMUNITY</a>
+      <a href="contact.html">CONTACT</a>
+      <a href="signin.html" class="signed-out-only">SIGN IN</a>
+      <a href="account.html" class="signed-in-only">ACCOUNT</a>
+    </nav>
+
+    <p class="footer-copy">© 2026 Parallel Universe Studios. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="auth.js"></script>
+<script src="search.js"></script>
+
+</body>
+</html>
