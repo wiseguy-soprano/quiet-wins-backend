@@ -140,6 +140,7 @@
   const SPEECH = ['M20 14.5a2.5 2.5 0 01-2.5 2.5H8l-4 3.5V5.5A2.5 2.5 0 016.5 3h11A2.5 2.5 0 0120 5.5z'];
   const TRASH = ['M4 6h16M9 6V4.5A1.5 1.5 0 0110.5 3h3A1.5 1.5 0 0115 4.5V6M6.5 6l.8 13a1.5 1.5 0 001.5 1.4h6.4a1.5 1.5 0 001.5-1.4l.8-13'];
   const FLAG = ['M5 21V4M5 4h13l-3 4 3 4H5'];
+  const MAIL = ['M4 6h16v12H4z', 'M4 7l8 6 8-6'];
 
   // signed in, the account owns the name; signed out, the field does
   function account() {
@@ -252,6 +253,12 @@
       del.append(' DELETE');
       bar.appendChild(del);
     } else {
+      const message = el('a', 'c-act');
+      message.href = `messages.html?with=${encodeURIComponent(p.userId)}&name=${encodeURIComponent(p.name)}`;
+      message.appendChild(icon(MAIL, { size: 14 }));
+      message.append(' MESSAGE');
+      bar.appendChild(message);
+
       const report = el('button', 'c-act c-act--report');
       report.type = 'button';
       report.dataset.act = 'report-post';
@@ -290,6 +297,10 @@
     const nm = el('div', 'c-comment-name', c.name);
     nm.appendChild(el('span', null, timeAgo(c.createdAt)));
     if (!c.mine) {
+      const message = el('a', 'c-comment-report', 'Message');
+      message.href = `messages.html?with=${encodeURIComponent(c.userId)}&name=${encodeURIComponent(c.name)}`;
+      nm.appendChild(message);
+
       const report = el('button', 'c-comment-report', 'Report');
       report.type = 'button';
       report.dataset.act = 'report-comment';

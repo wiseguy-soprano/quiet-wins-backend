@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Leaderboard — Parallel Universe Studios</title>
-<meta name="description" content="Top voices in the Reading Room, ranked by points." />
+<title>Messages — Parallel Universe Studios</title>
+<meta name="description" content="Your conversations." />
+<meta name="robots" content="noindex" />
 <script>try{if(localStorage.getItem('pus.user'))document.documentElement.classList.add('is-authed')}catch(e){}</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +44,6 @@
         <a href="search.html" class="icon-ring icon-ring--round" aria-label="Search">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
         </a>
-        <a href="community.html" class="btn-ghost signed-out-only">JOIN OUR COMMUNITY</a>
         <a href="signin.html" class="signin-link signed-out-only">SIGN IN</a>
         <a href="signin.html" class="icon-ring icon-ring--round signed-out-only" aria-label="Account">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
@@ -65,7 +65,7 @@
             </div>
             <a href="account.html">Profile settings</a>
             <a href="community.html">The Reading Room</a>
-            <a href="messages.html">Messages</a>
+            <a href="messages.html" aria-current="page">Messages</a>
             <a href="admin.html" class="admin-only">Admin panel</a>
             <hr />
             <button type="button" data-signout>Sign out</button>
@@ -87,24 +87,48 @@
       <a href="signin.html" class="signed-out-only">SIGN IN</a>
       <a href="signup.html" class="signed-out-only">SIGN UP</a>
       <a href="account.html" class="signed-in-only">PROFILE SETTINGS</a>
+      <a href="messages.html" class="signed-in-only active" aria-current="page">MESSAGES</a>
       <a href="admin.html" class="admin-only">ADMIN PANEL</a>
       <button type="button" class="mobile-signout signed-in-only" data-signout>SIGN OUT</button>
     </nav>
   </div>
 </header>
 
-<!-- ================= LEADERBOARD ================= -->
+<!-- ================= MESSAGES ================= -->
 <main class="page-section">
   <div class="wrap">
 
     <div class="account-page-head">
-      <div class="kicker">THE READING ROOM</div>
-      <h1 class="serif bone">Leaderboard</h1>
-      <p>Ranked by points — posting, replying and being liked all count.</p>
+      <div class="kicker">YOUR INBOX</div>
+      <h1 class="serif bone">Messages</h1>
+      <p>Direct conversations with other readers.</p>
     </div>
 
-    <ol class="leaderboard-list" id="leaderboardList"></ol>
-    <p id="leaderboardStatus" class="account-hint"></p>
+    <div class="messages-layout">
+      <aside class="messages-list-pane">
+        <ul id="conversationList" class="messages-list"></ul>
+        <p id="conversationsStatus" class="account-hint"></p>
+      </aside>
+
+      <section class="messages-thread-pane">
+        <div id="threadEmpty" class="messages-empty">
+          <p>Select a conversation, or message someone from one of their posts in the Reading Room.</p>
+        </div>
+
+        <div id="threadView" class="messages-thread" hidden>
+          <div class="messages-thread-head">
+            <span class="account-avatar" id="threadAvatar" aria-hidden="true"></span>
+            <strong id="threadName"></strong>
+          </div>
+          <div id="threadMessages" class="messages-thread-body"></div>
+          <form id="threadForm" class="messages-thread-form">
+            <input id="threadInput" type="text" maxlength="2000" placeholder="Write a message…" autocomplete="off" />
+            <button type="submit" class="btn-solid">SEND</button>
+          </form>
+          <p class="c-error" id="threadError" role="alert" style="min-height:1em; font-size:.75rem; color:#e08a72; margin-top:8px;"></p>
+        </div>
+      </section>
+    </div>
 
   </div>
 </main>
@@ -131,7 +155,7 @@
 </footer>
 
 <script src="auth.js"></script>
-<script src="leaderboard.js"></script>
+<script src="messages.js"></script>
 
 </body>
 </html>

@@ -42,7 +42,7 @@ router.get('/conversations', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('messages')
-      .select('*')
+      .select('*, sender:users!messages_sender_id_fkey(name, avatar_hue), recipient:users!messages_recipient_id_fkey(name, avatar_hue)')
       .or(`sender_id.eq.${req.user.id},recipient_id.eq.${req.user.id}`)
       .order('created_at', { ascending: false });
 
@@ -71,7 +71,7 @@ router.get('/:userId', [
   try {
     const { data, error } = await supabase
       .from('messages')
-      .select('*')
+      .select('*, sender:users!messages_sender_id_fkey(name, avatar_hue), recipient:users!messages_recipient_id_fkey(name, avatar_hue)')
       .or(`and(sender_id.eq.${req.user.id},recipient_id.eq.${otherId}),and(sender_id.eq.${otherId},recipient_id.eq.${req.user.id})`)
       .order('created_at', { ascending: true });
 
