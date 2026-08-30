@@ -162,10 +162,12 @@
       <div class="track-body">
         <h3>BEAUTY FOR ASHES</h3>
         <p>A song about reclaiming what was taken — written in the wreckage of a legal fight with no lawyer and no guarantee. Sankofa carries the same charge: you're allowed to return for what's yours.</p>
-        <a href="#" class="listen">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>
-          LISTEN NOW
-        </a>
+        <button type="button" class="listen" id="listenBeauty">
+          <svg class="icon-play" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>
+          <svg class="icon-pause" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" hidden><rect x="5" y="4" width="5" height="16"/><rect x="14" y="4" width="5" height="16"/></svg>
+          <span class="listen-label">LISTEN NOW</span>
+        </button>
+        <audio id="audioBeauty" preload="none" src="https://wpazbjlybdfvthhznzug.supabase.co/storage/v1/object/public/music/b3b4e900-5d30-4b30-9ff0-8066bf7c7f80.m4a"></audio>
       </div>
     </article>
 
@@ -181,10 +183,12 @@
       <div class="track-body">
         <h3>I AM<br />THAT I AM</h3>
         <p>A declaration of identity that answers to no one but the source it comes from. Gye Nyame speaks to a supremacy nothing else can touch — the same ground this song stands on.</p>
-        <a href="#" class="listen">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>
-          LISTEN NOW
-        </a>
+        <button type="button" class="listen" id="listenIAmThatIAm">
+          <svg class="icon-play" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8z"/></svg>
+          <svg class="icon-pause" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" hidden><rect x="5" y="4" width="5" height="16"/><rect x="14" y="4" width="5" height="16"/></svg>
+          <span class="listen-label">LISTEN NOW</span>
+        </button>
+        <audio id="audioIAmThatIAm" preload="none" src="https://wpazbjlybdfvthhznzug.supabase.co/storage/v1/object/public/music/8f2e27c0-edd8-4852-9633-82659a7071a8.m4a"></audio>
       </div>
     </article>
 
@@ -277,6 +281,32 @@
   setTimeout(() => {
     document.querySelectorAll('.m-reveal:not(.in)').forEach(el => el.classList.add('in'));
   }, 1400);
+
+  function wireTrackPlayer(btnId, audioId) {
+    const btn = document.getElementById(btnId);
+    const audio = document.getElementById(audioId);
+    const iconPlay = btn.querySelector('.icon-play');
+    const iconPause = btn.querySelector('.icon-pause');
+    const label = btn.querySelector('.listen-label');
+
+    function setPlaying(isPlaying) {
+      iconPlay.hidden = isPlaying;
+      iconPause.hidden = !isPlaying;
+      label.textContent = isPlaying ? 'PAUSE' : 'LISTEN NOW';
+    }
+
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('audio').forEach((a) => { if (a !== audio && !a.paused) a.pause(); });
+      if (audio.paused) audio.play(); else audio.pause();
+    });
+
+    audio.addEventListener('play', () => setPlaying(true));
+    audio.addEventListener('pause', () => setPlaying(false));
+    audio.addEventListener('ended', () => setPlaying(false));
+  }
+
+  wireTrackPlayer('listenBeauty', 'audioBeauty');
+  wireTrackPlayer('listenIAmThatIAm', 'audioIAmThatIAm');
 </script>
 
 <script src="auth.js"></script>

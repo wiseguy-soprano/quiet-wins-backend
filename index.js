@@ -47,12 +47,16 @@ app.set('trust proxy', 1);
 // script-src 'unsafe-inline' is needed because the frontend uses small inline
 // <script> blocks throughout; XSS protection instead relies on the frontend
 // rendering all user content via textContent, never innerHTML (see community.js)
+// media-src is added explicitly so <audio>/<video> can load uploaded files
+// straight from Supabase Storage — without it, browsers fall back to
+// default-src 'self' and silently block the request.
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       'script-src': ["'self'", "'unsafe-inline'"],
-      'script-src-attr': null
+      'script-src-attr': null,
+      'media-src': ["'self'", process.env.SUPABASE_URL]
     }
   }
 }));
