@@ -929,6 +929,28 @@
   .search-card-foot a{ font-size:.76rem; color:var(--gold); }
   .search-card-foot a:hover{ color:var(--gold-bright); }
 
+  /* ---------- leaderboard ---------- */
+  .leaderboard-list{ list-style:none; padding:0; margin:8px 0 0; display:flex; flex-direction:column; gap:2px; }
+  .leaderboard-row{
+    display:flex; align-items:center; gap:16px;
+    padding:14px 16px; border-radius:8px;
+    border:1px solid transparent; border-bottom-color:rgba(255,255,255,.06);
+  }
+  .leaderboard-row.is-me{
+    border-color:var(--gold-dim); background:rgba(214,163,74,.06);
+  }
+  .leaderboard-rank{
+    font-family:'Cormorant Garamond', serif; font-size:1.1rem; color:var(--smoke);
+    width:36px; flex-shrink:0; font-variant-numeric:tabular-nums;
+  }
+  .leaderboard-meta{ display:flex; flex-direction:column; gap:3px; min-width:0; flex:1; }
+  .leaderboard-name{ color:var(--bone); font-size:.9rem; }
+  .leaderboard-stats{ color:var(--smoke); font-size:.72rem; }
+  .leaderboard-points{
+    font-family:'Cormorant Garamond', serif; font-size:1.4rem; color:var(--gold-bright);
+    font-variant-numeric:tabular-nums; flex-shrink:0;
+  }
+
   .account-badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
   .account-badge{
     display:flex; align-items:center; gap:8px;
