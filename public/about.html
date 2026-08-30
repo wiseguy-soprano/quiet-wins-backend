@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Contact — Parallel Universe Studios</title>
-<meta name="description" content="Get in touch with Parallel Universe Studios — submissions, partnerships and general enquiries." />
-
+<title>About — Parallel Universe Studios</title>
+<meta name="description" content="A creative studio for diasporic storytelling. Who we are and why we tell stories that travel worlds." />
 <script>try{if(localStorage.getItem('pus.user'))document.documentElement.classList.add('is-authed')}catch(e){}</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,22 +33,22 @@
 
       <nav class="nav-desktop">
         <a href="index.html">HOME</a>
-        <a href="about.html">ABOUT</a>
+        <a href="about.html" class="active" aria-current="page">ABOUT</a>
         <a href="books.html">BOOKS</a>
         <a href="music.html">MUSIC</a>
         <a href="community.html">COMMUNITY</a>
-        <a href="contact.html" class="active" aria-current="page">CONTACT</a>
+        <a href="contact.html">CONTACT</a>
       </nav>
 
       <div class="header-actions">
-        <a href="community.html" class="btn-ghost signed-out-only">JOIN OUR COMMUNITY</a>
-        <a href="signin.html" class="signin-link signed-out-only">SIGN IN</a>
         <a href="search.html" class="icon-ring icon-ring--round" aria-label="Search">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
         </a>
         <a href="messages.html" class="icon-ring icon-ring--round signed-in-only" aria-label="Messages" id="inboxLink">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
         </a>
+        <a href="community.html" class="btn-ghost signed-out-only">JOIN OUR COMMUNITY</a>
+        <a href="signin.html" class="signin-link signed-out-only">SIGN IN</a>
         <a href="signin.html" class="icon-ring icon-ring--round signed-out-only" aria-label="Account">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
         </a>
@@ -70,6 +69,8 @@
             </div>
             <a href="account.html">Profile settings</a>
             <a href="community.html">The Reading Room</a>
+            <a href="messages.html">Messages</a>
+            <a href="admin.html" class="admin-only">Admin panel</a>
             <hr />
             <button type="button" data-signout>Sign out</button>
           </div>
@@ -90,15 +91,16 @@
 
     <nav id="mobileNav" class="mobile-nav">
       <a href="index.html">HOME</a>
-      <a href="about.html">ABOUT</a>
+      <a href="about.html" class="active" aria-current="page">ABOUT</a>
       <a href="books.html">BOOKS</a>
       <a href="music.html">MUSIC</a>
       <a href="community.html">COMMUNITY</a>
-      <a href="contact.html" class="active" aria-current="page">CONTACT</a>
+      <a href="contact.html">CONTACT</a>
       <a href="signin.html" class="signed-out-only">SIGN IN</a>
       <a href="signup.html" class="signed-out-only">SIGN UP</a>
       <a href="community.html" class="btn-ghost signed-out-only">JOIN OUR COMMUNITY</a>
       <a href="account.html" class="signed-in-only">PROFILE SETTINGS</a>
+      <a href="admin.html" class="admin-only">ADMIN PANEL</a>
       <button type="button" class="mobile-signout signed-in-only" data-signout>SIGN OUT</button>
     </nav>
   </div>
@@ -107,64 +109,72 @@
 <!-- ================= PAGE HERO ================= -->
 <section class="page-hero">
   <div class="wrap">
-    <div class="kicker">CONTACT</div>
-    <h1 class="serif bone">Tell us your <em class="gold" style="font-style:italic;">story.</em></h1>
-    <p>Submissions, partnerships, press or a message from across the world — we read everything that comes in.</p>
+    <div class="kicker">WHO WE ARE</div>
+    <h1 class="serif bone">A studio for stories that <em class="gold" style="font-style:italic;">travel.</em></h1>
+    <p>Parallel Universe Studios is a creative home for diasporic storytelling — books, music and community that move across cultures, timelines and realities.</p>
   </div>
 </section>
 
-<!-- ================= FORM ================= -->
+<!-- ================= OUR STORY ================= -->
 <section class="page-section">
   <div class="wrap">
     <div class="reveal section-heading">
       <div class="hairline-center"></div>
-      <h2>SEND A MESSAGE</h2>
+      <h2>OUR STORY</h2>
       <div class="hairline-center"></div>
     </div>
 
-    <form id="contactForm" class="reveal contact-form">
-      <input required type="text" placeholder="Your name" />
-      <input required type="email" placeholder="Your email" />
-      <input type="text" placeholder="Subject" />
-      <textarea required rows="6" placeholder="Your message"></textarea>
-      <button type="submit" class="btn-solid">SEND MESSAGE</button>
-      <p id="contactMsg" class="newsletter-msg">Thank you — we'll be in touch soon.</p>
-    </form>
+    <div class="reveal center-text">
+      <p>We started with a simple belief: the stories of people who live between worlds deserve a home of their own. Stories of leaving and arriving. Of mothers and sons. Of languages kept alive at kitchen tables far from where they were born.</p>
+      <p>Today we publish books and produce music that carry those stories forward, and we're building a community — the Reading Room — so readers can meet each other in the space between the pages, not just read alone.</p>
+    </div>
   </div>
 </section>
 
-<!-- ================= WAYS TO REACH US ================= -->
+<!-- ================= WHAT WE BELIEVE ================= -->
 <section class="page-section">
   <div class="wrap">
     <div class="reveal section-heading">
       <div class="hairline-center"></div>
-      <h2>OTHER WAYS TO REACH US</h2>
+      <h2>WHAT WE BELIEVE</h2>
       <div class="hairline-center"></div>
     </div>
 
     <div class="card-grid">
       <div class="reveal card" style="transition-delay:.05s">
-        <h3 class="serif bone">Submissions</h3>
-        <p>Manuscripts, music and film pitches. Tell us what you are making and where it comes from — the form above reaches the right desk.</p>
-        <a href="#contactForm" class="link-underline">SEND A SUBMISSION →</a>
+        <h3 class="serif bone">Stories that heal</h3>
+        <p>The right story at the right time can mend something no medicine can reach. We look for those stories first.</p>
       </div>
       <div class="reveal card" style="transition-delay:.1s">
-        <h3 class="serif bone">Partnerships</h3>
-        <p>Festivals, bookstores, labels and studios who want to work with us on something worth making.</p>
-        <a href="#" class="link-underline">PARTNER WITH US →</a>
+        <h3 class="serif bone">Stories that challenge</h3>
+        <p>We publish and produce work that asks hard questions and refuses easy answers.</p>
       </div>
       <div class="reveal card" style="transition-delay:.15s">
-        <h3 class="serif bone">Press</h3>
-        <p>Interview requests, review copies and assets for anyone writing about our work.</p>
-        <a href="#" class="link-underline">PRESS KIT →</a>
+        <h3 class="serif bone">Stories that open doors</h3>
+        <p>Every story is a doorway to another world. Our job is to hold it open for as many people as possible.</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <div class="reveal socials-row" style="display:flex; justify-content:center; margin-top:40px; padding-bottom:0;">
-      <a href="#" class="icon-ring icon-ring--square"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 3.25.15 4.77 1.7 4.92 4.92.06 1.3.07 1.65.07 4.86s-.01 3.56-.07 4.86c-.15 3.23-1.66 4.77-4.92 4.92-1.3.06-1.64.07-4.9.07s-3.6-.01-4.9-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.3-.07-1.65-.07-4.86s.01-3.56.07-4.86C2.33 3.97 3.85 2.42 7.1 2.27 8.4 2.21 8.8 2.2 12 2.2zm0 3.5a6.3 6.3 0 100 12.6 6.3 6.3 0 000-12.6zm0 10.4a4.1 4.1 0 110-8.2 4.1 4.1 0 010 8.2zm6.5-10.6a1.47 1.47 0 11-2.94 0 1.47 1.47 0 012.94 0z"/></svg></a>
-      <a href="#" class="icon-ring icon-ring--square"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8.4h2.8l.4-3.3h-3.2V8.1c0-.95.27-1.6 1.63-1.6H17V3.5A22 22 0 0014.4 3c-2.6 0-4.4 1.6-4.4 4.5v2.7H7.2v3.3h2.8V22z"/></svg></a>
-      <a href="#" class="icon-ring icon-ring--square"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 3h3l-6.6 7.5L22.6 21h-6.1l-4.8-6.3L6.2 21H3.2l7.1-8.1L2 3h6.3l4.3 5.8zm-1 16.2h1.7L7.8 4.7H6z"/></svg></a>
-      <a href="#" class="icon-ring icon-ring--square"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.1s-.2-1.6-.8-2.3c-.8-.9-1.7-.9-2.1-1C16 4.5 12 4.5 12 4.5h0s-4 0-7.1.3c-.4 0-1.3.1-2.1 1C2.2 6.5 2 8.1 2 8.1S1.8 10 1.8 12v1.9c0 1.9.2 3.8.2 3.8s.2 1.6.8 2.3c.8 1 1.9.9 2.4 1 1.7.2 7.3.3 7.3.3h0s4-.1 7.1-.3c.4-.1 1.3-.1 2.1-1 .6-.7.8-2.3.8-2.3s.2-1.9.2-3.8V12c0-1.9-.2-3.9-.2-3.9zM9.9 15.4V9l6 3.2z"/></svg></a>
+<!-- ================= QUOTE ================= -->
+<section class="page-section">
+  <div class="wrap">
+    <div class="reveal quote-block">
+      <span class="serif quote-mark">&ldquo;</span>
+      <p class="serif bone">We believe in stories that heal, stories that challenge and stories that open doors to new worlds.</p>
+      <p class="quote-attr">— PARALLEL UNIVERSE STUDIOS</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= JOIN CTA ================= -->
+<section class="page-section">
+  <div class="wrap">
+    <div class="reveal center-text" style="max-width:520px;">
+      <h2 style="margin-bottom:16px;">Read with us</h2>
+      <p>The Reading Room is where this studio's community actually lives — post, reply, and find people reading the same book you are.</p>
+      <a href="community.html" class="btn-solid" style="margin-top:8px;">JOIN THE READING ROOM →</a>
     </div>
   </div>
 </section>
@@ -191,6 +201,7 @@
   </div>
 </footer>
 
+<script src="auth.js"></script>
 <script>
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
@@ -199,17 +210,7 @@
   setTimeout(() => {
     document.querySelectorAll('.reveal:not(.in)').forEach(el => el.classList.add('in'));
   }, 1200);
-
-  const form = document.getElementById('contactForm');
-  const msg = document.getElementById('contactMsg');
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    msg.classList.add('show');
-    form.reset();
-  });
 </script>
-
-<script src="auth.js"></script>
 
 </body>
 </html>
