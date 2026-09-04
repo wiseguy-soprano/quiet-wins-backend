@@ -139,6 +139,18 @@
       const u = PUS.get();
       if (!u || u.role !== 'admin') { location.replace(to); return false; }
       return true;
+    },
+
+    /* ---------- timestamps ----------
+       Postgres/Supabase returns created_at etc. as a naive string with
+       no UTC marker (e.g. "2026-09-04T14:46:44.981217"). new Date() on
+       a string like that is parsed as LOCAL time per the ECMAScript
+       spec, not UTC — silently shifting every "time ago" label by the
+       viewer's UTC offset. Always go through this instead of
+       new Date(ts) directly for a timestamp that came from the API. */
+    parseDate(ts) {
+      if (typeof ts === 'string' && !/[Zz]|[+-]\d\d:?\d\d$/.test(ts)) ts += 'Z';
+      return new Date(ts);
     }
   };
 

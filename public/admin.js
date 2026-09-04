@@ -29,7 +29,7 @@
   }
 
   function timeAgo(ts) {
-    const s = Math.max(0, (Date.now() - new Date(ts).getTime()) / 1000);
+    const s = Math.max(0, (Date.now() - PUS.parseDate(ts).getTime()) / 1000);
     if (s < 60) return 'just now';
     const m = Math.floor(s / 60);
     if (m < 60) return m + 'm ago';
@@ -37,7 +37,7 @@
     if (h < 24) return h + 'h ago';
     const d = Math.floor(h / 24);
     if (d < 30) return d + 'd ago';
-    return new Date(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+    return PUS.parseDate(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   function el(tag, cls, text) {

@@ -58,7 +58,7 @@
       hue: c.author && c.author.avatar_hue != null ? c.author.avatar_hue : hueOf((c.author && c.author.name) || 'Reader'),
       topic: c.topic || 'GENERAL',
       body: c.body || '',
-      createdAt: new Date(c.created_at).getTime(),
+      createdAt: PUS.parseDate(c.created_at).getTime(),
       likes: likeInfo[i].count,
       likedByMe: likeInfo[i].liked,
       mine: myId === c.user_id,
@@ -68,7 +68,7 @@
         name: (cm.author && cm.author.name) || 'Reader',
         hue: cm.author && cm.author.avatar_hue != null ? cm.author.avatar_hue : hueOf((cm.author && cm.author.name) || 'Reader'),
         text: cm.body,
-        createdAt: new Date(cm.created_at).getTime(),
+        createdAt: PUS.parseDate(cm.created_at).getTime(),
         mine: myId === cm.user_id
       }))
     }));
