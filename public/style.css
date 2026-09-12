@@ -488,7 +488,7 @@
   /* ---------- Community / quote / newsletter ---------- */
   .section-community{ position:relative; z-index:10; border-top:1px solid rgba(255,255,255,.05); padding:80px 0; }
   .community-grid{ display:grid; gap:40px; align-items:stretch; }
-  @media(min-width:1024px){ .community-grid{ grid-template-columns:repeat(3,1fr); } }
+  @media(min-width:1024px){ .community-grid{ grid-template-columns:repeat(2,1fr); max-width:900px; margin:0 auto; } }
 
   .community-card{ border:1px solid rgba(214,163,74,.25); border-radius:2px; padding:24px; display:flex; gap:20px; align-items:center; }
   .community-card h3{ font-size:1.3rem; margin-bottom:8px; }
@@ -499,14 +499,6 @@
   .quote-block p{ font-size:1.35rem; font-style:italic; line-height:1.5; }
   .quote-attr{ font-size:.68rem; letter-spacing:.25em; color:var(--gold); margin-top:32px; }
 
-  .newsletter h3{ font-size:.72rem; letter-spacing:.25em; color:var(--gold); margin-bottom:12px; }
-  .newsletter p{ color:var(--smoke); font-size:.9rem; line-height:1.6; margin-bottom:20px; }
-  .newsletter-form{ display:flex; gap:8px; }
-  .newsletter-form input{
-    flex:1; min-width:0; background:transparent; border:1px solid rgba(255,255,255,.2);
-    outline:none; padding:13px 16px; font-size:.9rem; color:var(--bone); transition:border-color .3s ease;
-  }
-  .newsletter-form input:focus{ border-color:var(--gold); }
   .newsletter-msg{ color:var(--gold); font-size:.75rem; margin-top:12px; display:none; }
   .newsletter-msg.show{ display:block; }
   .newsletter-msg[data-state="error"]{ color:#e08a72; }

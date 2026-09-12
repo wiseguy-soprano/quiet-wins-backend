@@ -200,16 +200,6 @@ sessionStorage.setItem('pus.intro','1')}catch(e){}</script>
       <p class="serif bone">We believe in stories that heal, stories that challenge and stories that open doors to new worlds.</p>
       <p class="quote-attr">— PARALLEL UNIVERSE STUDIOS</p>
     </div>
-
-    <div id="connect" class="reveal newsletter" style="transition-delay:.2s">
-      <h3>STAY CONNECTED</h3>
-      <p>Updates on new releases, events, stories and inspiration.</p>
-      <form id="newsletterForm" class="newsletter-form">
-        <input required type="email" placeholder="Enter your email" />
-        <button type="submit" class="btn-solid">SUBSCRIBE</button>
-      </form>
-      <p id="newsletterMsg" class="newsletter-msg">Thank you — you're on the list.</p>
-    </div>
   </div>
 </section>
 
@@ -244,14 +234,6 @@ sessionStorage.setItem('pus.intro','1')}catch(e){}</script>
   setTimeout(() => {
     document.querySelectorAll('.reveal:not(.in)').forEach(el => el.classList.add('in'));
   }, 1200);
-
-  const form = document.getElementById('newsletterForm');
-  const msg = document.getElementById('newsletterMsg');
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    msg.classList.add('show');
-    form.reset();
-  });
 </script>
 
 <script src="auth.js"></script>
