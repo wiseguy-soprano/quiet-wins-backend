@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const REQUIRED_ENV_VARS = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'JWT_SECRET'];
+const REQUIRED_ENV_VARS = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET'];
 const missingEnvVars = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
 
 if (missingEnvVars.length) {
@@ -38,7 +38,7 @@ const PORT = process.env.PORT || 3000;
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 // Render sits behind a proxy; needed for express-rate-limit to see the real client IP

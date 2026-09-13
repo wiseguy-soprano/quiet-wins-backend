@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 // GET all notifications for logged in user (protected)
